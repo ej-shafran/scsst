@@ -143,7 +143,7 @@ export class Lexer {
 
       while (this.isNotEmpty() && !endsKeyword(this.current(), hasNumber)) {
         this.chopChar();
-        hasNumber = /[0-9]/.test(this.current());
+        hasNumber = /[0-9.]/.test(this.current());
       }
 
       if (this.current() === " ") {

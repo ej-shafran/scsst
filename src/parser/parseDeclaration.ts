@@ -25,7 +25,7 @@ export function parseDeclaration(lexer: Lexer, priorToken?: Token<"KEYWORD">) {
     return;
   }
 
-  const semicolonOrFunc = lexer.expect("SEMICOLON", "OPAREN"); // TODO: deal with functions
+  const semicolonOrFunc = lexer.expect("SEMICOLON", "OPAREN"); // TODO: deal with spaces
 
   if (semicolonOrFunc instanceof ParserError) {
     report(semicolonOrFunc.message, semicolonOrFunc.loc);
