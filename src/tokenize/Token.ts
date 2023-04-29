@@ -5,7 +5,7 @@ import { Loc } from "./Loc";
 
 export const TokenType = createEnum(
   "SINGLE_LINE_COMMENT",
-  "MULTI_LINE_COMMENT",
+  "BLOCK_COMMENT",
   "KEYWORD",
   "OCURLY",
   "CCURLY",

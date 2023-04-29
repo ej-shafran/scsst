@@ -1,4 +1,4 @@
-import { Lexer, TokenType, report } from "./tokenize";
+import { Lexer, Token, TokenType, report } from "./tokenize";
 import * as fs from "fs";
 import { Node, ParserError, expect } from "./parser";
 import { Stylesheet, Comment } from "./parser/nodes";
@@ -9,14 +9,22 @@ const source = fs.readFileSync(filePath, "utf-8");
 const lexer = new Lexer(source, filePath);
 
 function parse(lexer: Lexer): Node[] {
-  return [parseComment(lexer)].filter((item): item is Comment => !!item);
+  let comment = parseComment(lexer);
+  const comments = [comment];
+
+  while (lexer.isNotEmpty()) {
+    comment = parseComment(lexer);
+    comments.push(comment);
+  }
+
+  return comments.filter((item): item is Comment => !!item);
 }
 
 function parseComment(lexer: Lexer) {
   const token = expect(
     lexer,
     TokenType.SINGLE_LINE_COMMENT,
-    TokenType.MULTI_LINE_COMMENT
+    TokenType.BLOCK_COMMENT,
   );
 
   if (token instanceof ParserError) {

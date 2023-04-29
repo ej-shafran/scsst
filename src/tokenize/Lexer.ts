@@ -84,7 +84,7 @@ export class Lexer {
       }
 
       return new Token(
-        TokenType.MULTI_LINE_COMMENT,
+        TokenType.BLOCK_COMMENT,
         this.source.slice(start, this.cursor),
         loc
       );
