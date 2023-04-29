@@ -1,4 +1,4 @@
-import { isWhitespace } from "../common/functions";
+import { isWhitespace, selectorEnd, startsSelector } from "../common/functions";
 import { Loc } from "./Loc";
 import { Token, TokenType } from "./Token";
 
@@ -47,11 +47,13 @@ export class Lexer {
   }
 
   loc() {
-    return new Loc(this.filePath, this.row, this.cursor - this.lineStart);
+    return new Loc(this.filePath, this.row, this.cursor - this.lineStart + 1);
   }
 
   nextToken() {
     this.trimLeft();
+
+    if (this.isEmpty()) return;
 
     // single line comment
     if (this.current(2) === "//") {
@@ -81,6 +83,42 @@ export class Lexer {
 
       return new Token(
         TokenType.MULTI_LINE_COMMENT,
+        this.source.slice(start, this.cursor),
+        loc
+      );
+    }
+
+    // attribute selector
+    if (this.current() === "[") {
+      const loc = this.loc();
+      const start = this.cursor;
+
+      while (this.isNotEmpty() && this.current() !== "]") {
+        this.chopChar();
+      }
+
+      this.chopChar();
+
+      return new Token(
+        TokenType.SELECTOR,
+        this.source.slice(start, this.cursor),
+        loc
+      );
+    }
+
+    // selector
+    if (startsSelector(this.current())) {
+      const loc = this.loc();
+      const start = this.cursor;
+
+      this.chopChar();
+
+      while (this.isNotEmpty() && !selectorEnd(this.current())) {
+        this.chopChar();
+      }
+
+      return new Token(
+        TokenType.SELECTOR,
         this.source.slice(start, this.cursor),
         loc
       );

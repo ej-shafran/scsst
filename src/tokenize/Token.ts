@@ -5,6 +5,9 @@ import { EnumType } from "../common/types";
 export const TokenType = createEnum(
   "SINGLE_LINE_COMMENT",
   "MULTI_LINE_COMMENT",
+  "SELECTOR",
+  "OCURLY",
+  "CCURLY"
 );
 export type TokenType = EnumType<typeof TokenType>;
 
