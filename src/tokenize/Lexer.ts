@@ -74,7 +74,7 @@ export class Lexer {
       const start = this.cursor;
       this.dropLine();
       return new Token(
-        TokenType.SINGLE_LINE_COMMENT,
+        "SINGLE_LINE_COMMENT",
         this.source.slice(start, this.cursor),
         loc
       );
@@ -95,7 +95,7 @@ export class Lexer {
       }
 
       return new Token(
-        TokenType.BLOCK_COMMENT,
+        "BLOCK_COMMENT",
         this.source.slice(start, this.cursor),
         loc
       );
@@ -113,7 +113,7 @@ export class Lexer {
       this.chopChar();
 
       return new Token(
-        TokenType.KEYWORD,
+        "KEYWORD",
         this.source.slice(start, this.cursor),
         loc
       );
@@ -131,11 +131,11 @@ export class Lexer {
       }
 
       if (this.current() === " ") {
-        this._next = new Token(TokenType.SPACE, " ", this.loc());
+        this._next = new Token("SPACE", " ", this.loc());
       }
 
       return new Token(
-        TokenType.KEYWORD,
+        "KEYWORD",
         this.source.slice(start, this.cursor),
         loc
       );

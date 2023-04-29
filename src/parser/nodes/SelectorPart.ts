@@ -1,6 +1,6 @@
 import { createEnum } from "../../common/functions";
 import { EnumType } from "../../common/types";
-import { Loc, Token, TokenType } from "../../tokenize";
+import { Loc, Token } from "../../tokenize";
 
 const SelectorPartType = createEnum(
   "TAG",
@@ -39,10 +39,10 @@ export class SelectorPart {
     isPsudeo: boolean
   ) {
     switch (token.type) {
-      case TokenType.KEYWORD:
+      case "KEYWORD":
         if (isPsudeo) return SelectorPartType.PSEUDO_CLASS; // TODO: handle other cases?
         return SelectorPart.extractFromKeyword(token as Token<"KEYWORD">);
-      case TokenType.AMPERSAND:
+      case "AMPERSAND":
         return SelectorPartType.PARENT;
       default:
         return SelectorPartType.COMBINATOR;

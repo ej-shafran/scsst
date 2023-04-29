@@ -1,4 +1,4 @@
-import { Token, TokenType, report, Lexer } from "../tokenize";
+import { Token, report, Lexer } from "../tokenize";
 
 import { ParserError } from "./ParserError";
 import { Comment, Selector, SelectorPart } from "./nodes";
@@ -8,8 +8,7 @@ export function parseComment(
   priorToken?: Token<"SINGLE_LINE_COMMENT" | "BLOCK_COMMENT">
 ) {
   const token =
-    priorToken ??
-    lexer.expect(TokenType.SINGLE_LINE_COMMENT, TokenType.BLOCK_COMMENT);
+    priorToken ?? lexer.expect("SINGLE_LINE_COMMENT", "BLOCK_COMMENT");
 
   if (token instanceof ParserError) {
     report(token.message, token.loc);
@@ -20,22 +19,22 @@ export function parseComment(
 }
 
 const common = [
-  TokenType.KEYWORD,
-  TokenType.ASTERISK,
-  TokenType.COLON, // psuedo classes
+  "KEYWORD",
+  "ASTERISK",
+  "COLON", // psuedo classes
 ] as const;
 
 const active = [
   ...common,
-  TokenType.OPAREN,
-  TokenType.COMMA,
-  TokenType.RARROW,
-  TokenType.LARROW,
-  TokenType.OCURLY,
-  TokenType.SPACE,
+  "OPAREN",
+  "COMMA",
+  "RARROW",
+  "LARROW",
+  "OCURLY",
+  "SPACE",
 ] as const;
 
-const nested = [...active, TokenType.AMPERSAND] as const;
+const nested = [...active, "AMPERSAND"] as const;
 
 export function parseSelector(
   lexer: Lexer,
@@ -63,24 +62,24 @@ export function parseSelector(
     }
 
     switch (token.type) {
-      case TokenType.KEYWORD:
+      case "KEYWORD":
         parts.push(new SelectorPart(token as Token<any>, isPsudeo));
         isPsudeo = false;
         break;
-      case TokenType.COLON:
+      case "COLON":
         isPsudeo = true;
         break;
-      case TokenType.OPAREN:
+      case "OPAREN":
         break; // parse a function call
-      case TokenType.COMMA:
+      case "COMMA":
         break; // parse next selector
-      case TokenType.SPACE:
+      case "SPACE":
         pendingSpace = new SelectorPart(token as Token<any>);
         break;
       default:
         parts.push(new SelectorPart(token as Token<any>));
         break;
-      // case TokenType.OCURLY:
+      // case "OCURLY":
       //   break; // start parsing block
     }
 
