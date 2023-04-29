@@ -1,3 +1,4 @@
+import { Loc } from "../../tokenize";
 import { SelectorPart } from "./SelectorPart";
 
 type Specificity = {
@@ -11,7 +12,7 @@ export class Selector {
   specificity: Specificity;
   content: string;
 
-  constructor(parts: SelectorPart[]) {
+  constructor(parts: SelectorPart[], public loc: Loc) {
     this.specificity = Selector.calculateSpecificity(parts);
     this.content = Selector.buildContent(parts);
   }
