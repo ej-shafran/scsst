@@ -2,10 +2,8 @@ import * as fs from "fs";
 
 import { Lexer, Token, TokenType, report } from "./tokenize";
 import { Node, ParserError, expect } from "./parser";
-import { Stylesheet, Comment } from "./parser/nodes";
+import { Stylesheet, Comment, Selector, SelectorPart } from "./parser/nodes";
 import { parseComment } from "./parser/parse";
-import { SelectorPart } from "./parser/nodes/SelectorPart";
-
 const filePath = "test.scss";
 const source = fs.readFileSync(filePath, "utf-8");
 
@@ -52,8 +50,14 @@ function parseSelector(lexer: Lexer, priorToken?: any, isNested?: boolean) {
   const parts: SelectorPart[] = [];
 
   let isPsudeo = false;
+  let pendingSpace: SelectorPart | null = null;
 
   while (token.type !== "OCURLY") {
+    if (pendingSpace) {
+      parts.push(pendingSpace)
+      pendingSpace = null;
+    }
+
     switch (token.type) {
       case TokenType.KEYWORD:
         parts.push(new SelectorPart(token as Token<any>, isPsudeo));
@@ -66,6 +70,9 @@ function parseSelector(lexer: Lexer, priorToken?: any, isNested?: boolean) {
         break; // parse a function call
       case TokenType.COMMA:
         break; // parse next selector
+      case TokenType.SPACE:
+        pendingSpace = new SelectorPart(token as Token<any>);
+        break;
       default:
         parts.push(new SelectorPart(token as Token<any>));
         break;
@@ -81,11 +88,11 @@ function parseSelector(lexer: Lexer, priorToken?: any, isNested?: boolean) {
     }
   }
 
-  return parts;
+  return new Selector(parts);
 }
 
 // const sheet = new Stylesheet(lexer.loc(), parse(lexer));
 //
 // console.log(sheet);
-const parts = parseSelector(lexer);
-console.log(parts);
+const selector = parseSelector(lexer);
+console.log(selector);
