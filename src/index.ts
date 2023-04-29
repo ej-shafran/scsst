@@ -1,9 +1,9 @@
 import * as fs from "fs";
 
-import { Lexer } from "./tokenize";
-import { Node } from "./parser";
+import { Lexer, Token, TokenType, report } from "./tokenize";
+import { Node, ParserError } from "./parser";
 import { Selector, Stylesheet } from "./parser/nodes";
-import {  parseSelector } from "./parser/parse";
+import { parseSelector } from "./parser/parse";
 const filePath = "test.scss";
 const source = fs.readFileSync(filePath, "utf-8");
 
@@ -21,5 +21,19 @@ function parse(lexer: Lexer): Node[] {
   return selectors.filter((item): item is Selector => !!item);
 }
 
-const sheet = new Stylesheet(lexer.loc(), parse(lexer))
+// function parseBlock(lexer: Lexer, priorToken?: Token<"OCURLY">) {
+//   let token: Token<TokenType> | ParserError =
+//     priorToken ?? expect(lexer, TokenType.OCURLY);
+//
+//   if (token instanceof ParserError) {
+//     report(token.message, token.loc);
+//     return;
+//   }
+//
+//   while (token.type !== "CCURLY") {
+//     token = expect(lexer);
+//   }
+// }
+
+const sheet = new Stylesheet(lexer.loc(), parse(lexer));
 console.log(sheet);

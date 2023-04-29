@@ -1,2 +1,3 @@
 export * from "./nodes";
-export * from "./expect";
+export * from "./ParserError";
+export * from "./parse";

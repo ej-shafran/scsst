@@ -1,4 +1,6 @@
 import { isWhitespace, endsKeyword, startsKeyword } from "../common/functions";
+import { joinTypes } from "../common/functions/joinTypes";
+import { ParserError } from "../parser";
 
 import { Loc } from "./Loc";
 import { LiteralTokens, Token, TokenType } from "./Token";
@@ -153,6 +155,29 @@ export class Lexer {
 
     report("Unrecognized token", this.loc());
     throw new Error("Unrecognized token");
+  }
+
+  expect<TTypes extends TokenType[]>(
+    ...types: TTypes
+  ): ParserError | Token<TTypes[number]> {
+    const originalLoc = this.loc();
+    const token = this.nextToken();
+
+    if (!token) {
+      return new ParserError(
+        `Expected ${joinTypes(types)} but reached end of file`,
+        originalLoc
+      );
+    }
+
+    if (types.length && !types.includes(token.type)) {
+      return new ParserError(
+        `Expected ${joinTypes(types)} but got ${token.type}`,
+        token.loc
+      );
+    }
+
+    return token;
   }
 
   *[Symbol.iterator]() {

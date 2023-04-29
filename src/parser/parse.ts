@@ -1,5 +1,6 @@
-import { Lexer, Token, TokenType, report } from "../tokenize";
-import { ParserError, expect } from "./expect";
+import { Token, TokenType, report, Lexer } from "../tokenize";
+
+import { ParserError } from "./ParserError";
 import { Comment, Selector, SelectorPart } from "./nodes";
 
 export function parseComment(
@@ -8,7 +9,7 @@ export function parseComment(
 ) {
   const token =
     priorToken ??
-    expect(lexer, TokenType.SINGLE_LINE_COMMENT, TokenType.BLOCK_COMMENT);
+    lexer.expect(TokenType.SINGLE_LINE_COMMENT, TokenType.BLOCK_COMMENT);
 
   if (token instanceof ParserError) {
     report(token.message, token.loc);
@@ -41,7 +42,7 @@ export function parseSelector(
   priorToken?: any,
   isNested?: boolean
 ) {
-  let token = expect(lexer, ...(isNested ? nested : common));
+  let token = lexer.expect(...(isNested ? nested : common));
 
   const originalLoc = token.loc;
 
@@ -83,7 +84,7 @@ export function parseSelector(
       //   break; // start parsing block
     }
 
-    token = expect(lexer, ...(isNested ? nested : active));
+    token = lexer.expect(...(isNested ? nested : active));
 
     if (token instanceof ParserError) {
       report(token.message, token.loc);
