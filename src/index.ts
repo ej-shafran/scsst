@@ -3,26 +3,38 @@ import * as fs from "fs";
 import { Lexer } from "./tokenize";
 import { Node, Stylesheet } from "./nodes";
 import { parseMediaQuery } from "./parser/parseMediaQuery";
-import { MediaQuery } from "./nodes/MediaQuery";
+import { parseRule } from "./parser";
 
 const filePath = "test.scss";
 const source = fs.readFileSync(filePath, "utf-8");
 
 const lexer = new Lexer(source, filePath);
 
-//TODO: rename things to children
-
 function parse(lexer: Lexer): Node[] {
-  let rule = parseMediaQuery(lexer);
-  const rules = [rule];
+  const rules: Node[] = [];
 
-  // TODO: figure out why we hit the end of the file...
   while (lexer.isNotEmpty()) {
-    rule = parseMediaQuery(lexer);
-    rules.push(rule);
+    const next = lexer.parseNext();
+    console.log(next);
+
+    let rule: Node | undefined;
+    switch (next) {
+      case "MEDIA_QUERY":
+        rule = parseMediaQuery(lexer);
+        if (rule) rules.push(rule);
+        break;
+      case "RULE":
+        rule = parseRule(lexer);
+        if (rule) rules.push(rule);
+        break;
+      case "IMPORT_CALL":
+        break; //TODO
+      case "END":
+        return rules;
+    }
   }
 
-  return rules.filter((item): item is MediaQuery => !!item);
+  return rules;
 }
 
 const sheet = new Stylesheet(lexer.loc(), parse(lexer));

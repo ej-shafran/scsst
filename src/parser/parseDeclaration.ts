@@ -29,7 +29,8 @@ export function parseDeclaration(lexer: Lexer, priorToken?: Token<"KEYWORD">) {
   let semicolonOrFunc: Token<TokenType> | ParserError = lexer.expect(
     "SEMICOLON",
     "OPAREN",
-    "KEYWORD"
+    "KEYWORD",
+    "SPACE"
   );
 
   if (semicolonOrFunc instanceof ParserError) {
@@ -44,6 +45,15 @@ export function parseDeclaration(lexer: Lexer, priorToken?: Token<"KEYWORD">) {
   const values: (string | FunctionCall)[] = [];
 
   while (semicolonOrFunc.type !== "SEMICOLON") {
+    if (semicolonOrFunc.type === "SPACE") {
+      semicolonOrFunc = lexer.expect("KEYWORD");
+
+      if (semicolonOrFunc instanceof ParserError) {
+        report(semicolonOrFunc.message, semicolonOrFunc.loc);
+        return;
+      }
+    }
+
     if (semicolonOrFunc.type === "KEYWORD") {
       values.push(semicolonOrFunc.value);
     } else {

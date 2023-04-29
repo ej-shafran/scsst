@@ -14,6 +14,8 @@ const BLOCK_TOKENS = [
   "SINGLE_LINE_COMMENT",
 ] as const;
 
+//TODO: deal with @include, etc.
+
 export function parseBlock(lexer: Lexer, priorToken?: Token<"OCURLY">) {
   let token: Token<TokenType> | ParserError =
     priorToken ?? lexer.expect("OCURLY");

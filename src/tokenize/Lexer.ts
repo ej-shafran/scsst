@@ -74,6 +74,19 @@ export class Lexer {
     else return "declaration";
   }
 
+  parseNext() {
+    let i = 0;
+    while (isWhitespace(this.source[this.cursor + i])) i++;
+    if (this.source[this.cursor + i] === "@") {
+      if (this.isSelectorOrDeclaration() === "selector") return "MEDIA_QUERY";
+      else return "IMPORT_CALL";
+    }
+
+    if (this.cursor + i >= this.source.length) return "END";
+
+    return "RULE";
+  }
+
   nextToken() {
     if (this._next) {
       const token = this._next;
