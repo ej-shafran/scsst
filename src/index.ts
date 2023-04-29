@@ -2,8 +2,6 @@ import * as fs from "fs";
 
 import { Lexer } from "./tokenize";
 import { Node, Stylesheet } from "./nodes";
-import { parseRule } from "./parser";
-import { Rule } from "./nodes/Rule";
 import { parseMediaQuery } from "./parser/parseMediaQuery";
 import { MediaQuery } from "./nodes/MediaQuery";
 
