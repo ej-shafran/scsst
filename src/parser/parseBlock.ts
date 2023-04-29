@@ -1,41 +1,12 @@
-import { Token, report, Lexer, TokenType } from "../tokenize";
-
-import { ParserError } from "./ParserError";
-import { Comment, SelectorList } from "../nodes";
-import { Block } from "../nodes/Block";
+import { Block, Comment } from "../nodes";
 import { Declaration } from "../nodes/Declaration";
 import { Rule } from "../nodes/Rule";
-import { NESTED_SELECTOR_TOKENS, parseSelector } from "./parseSelector";
-import { parseDeclaration } from "./parseDeclaration";
+import { Lexer, Token, TokenType, report } from "../tokenize";
+import { ParserError } from "./ParserError";
+import { parseRule } from "./parseRule";
 import { parseComment } from "./parseComment";
-
-export function parseRule(
-  lexer: Lexer,
-  priorToken?: Token<(typeof NESTED_SELECTOR_TOKENS)[number]>,
-  isNested?: boolean
-) {
-  let result = parseSelector(lexer, priorToken, isNested);
-  if (!result) return;
-
-  const originalLoc = result.selector.loc;
-
-  const selectors = [result.selector];
-  let token = result.token;
-
-  while (token.type !== "OCURLY") {
-    result = parseSelector(lexer, undefined, isNested);
-    if (!result) return;
-
-    selectors.push(result.selector);
-    token = result.token;
-  }
-
-  const selectorList = new SelectorList(selectors, originalLoc);
-  const block = parseBlock(lexer, token as Token<"OCURLY">);
-  if (!block) return;
-
-  return new Rule(selectorList, block, originalLoc);
-}
+import { parseDeclaration } from "./parseDeclaration";
+import { NESTED_SELECTOR_TOKENS } from "./parseSelector";
 
 export function parseBlock(lexer: Lexer, priorToken?: Token<"OCURLY">) {
   let token: Token<TokenType> | ParserError =

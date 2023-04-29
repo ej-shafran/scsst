@@ -13,10 +13,10 @@ function parse(lexer: Lexer): Node[] {
   let rule = parseRule(lexer);
   const rules = [rule];
 
+  // TODO: figure out why we hit the end of the file...
   while (lexer.isNotEmpty()) {
     rule = parseRule(lexer);
     rules.push(rule);
-    console.log(lexer.isEmpty());
   }
 
   return rules.filter((item): item is Rule => !!item);
