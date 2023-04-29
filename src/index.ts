@@ -20,12 +20,13 @@ function parse(lexer: Lexer): Node[] {
   return comments.filter((item): item is Comment => !!item);
 }
 
-function parseComment(lexer: Lexer) {
-  const token = expect(
-    lexer,
-    TokenType.SINGLE_LINE_COMMENT,
-    TokenType.BLOCK_COMMENT,
-  );
+function parseComment(
+  lexer: Lexer,
+  priorToken?: Token<"SINGLE_LINE_COMMENT" | "BLOCK_COMMENT">
+) {
+  const token =
+    priorToken ??
+    expect(lexer, TokenType.SINGLE_LINE_COMMENT, TokenType.BLOCK_COMMENT);
 
   if (token instanceof ParserError) {
     report(token.message, token.loc);
