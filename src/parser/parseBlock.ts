@@ -8,6 +8,12 @@ import { parseComment } from "./parseComment";
 import { parseDeclaration } from "./parseDeclaration";
 import { NESTED_SELECTOR_TOKENS } from "./parseSelector";
 
+const BLOCK_TOKENS = [
+  "CCURLY",
+  ...NESTED_SELECTOR_TOKENS.filter((type) => type !== "OCURLY"),
+  "SINGLE_LINE_COMMENT",
+] as const;
+
 export function parseBlock(lexer: Lexer, priorToken?: Token<"OCURLY">) {
   let token: Token<TokenType> | ParserError =
     priorToken ?? lexer.expect("OCURLY");
@@ -22,11 +28,7 @@ export function parseBlock(lexer: Lexer, priorToken?: Token<"OCURLY">) {
   const lines: (Rule | Declaration | Comment)[] = [];
 
   while (token.type !== "CCURLY") {
-    token = lexer.expect(
-      "CCURLY",
-      ...NESTED_SELECTOR_TOKENS.filter((type) => type !== "OCURLY"), // TODO: take out of function
-      "SINGLE_LINE_COMMENT"
-    );
+    token = lexer.expect(...BLOCK_TOKENS);
 
     if (token instanceof ParserError) {
       report(token.message, token.loc);
