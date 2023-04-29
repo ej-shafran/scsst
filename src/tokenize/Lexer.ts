@@ -1,5 +1,9 @@
-import { isWhitespace, endsKeyword, startsKeyword } from "../common/functions";
-import { joinTypes } from "../common/functions/joinTypes";
+import {
+  isWhitespace,
+  endsKeyword,
+  startsKeyword,
+  joinTypes,
+} from "../common/functions";
 import { ParserError } from "../parser";
 
 import { Loc } from "./Loc";
@@ -112,11 +116,7 @@ export class Lexer {
 
       this.chopChar();
 
-      return new Token(
-        "KEYWORD",
-        this.source.slice(start, this.cursor),
-        loc
-      );
+      return new Token("KEYWORD", this.source.slice(start, this.cursor), loc);
     }
 
     // selector
@@ -134,11 +134,7 @@ export class Lexer {
         this._next = new Token("SPACE", " ", this.loc());
       }
 
-      return new Token(
-        "KEYWORD",
-        this.source.slice(start, this.cursor),
-        loc
-      );
+      return new Token("KEYWORD", this.source.slice(start, this.cursor), loc);
     }
 
     if (Object.keys(LiteralTokens).includes(this.current())) {

@@ -1,6 +1,3 @@
-import { createEnum } from "../common/functions";
-import { EnumType } from "../common/types";
-
 import { Loc } from "./Loc";
 
 export type TokenType =
