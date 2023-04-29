@@ -1,17 +1,13 @@
-import { createEnum } from "../../common/functions";
-import { EnumType } from "../../common/types";
 import { Loc, Token } from "../../tokenize";
 
-const SelectorPartType = createEnum(
-  "TAG",
-  "CLASS",
-  "ID",
-  "ATTRIB",
-  "COMBINATOR",
-  "PARENT",
-  "PSEUDO_CLASS"
-);
-type SelectorPartType = EnumType<typeof SelectorPartType>;
+type SelectorPartType =
+  | "TAG"
+  | "CLASS"
+  | "ID"
+  | "ATTRIB"
+  | "COMBINATOR"
+  | "PARENT"
+  | "PSEUDO_CLASS";
 
 export class SelectorPart {
   readonly type = "SELECTOR";
@@ -29,8 +25,7 @@ export class SelectorPart {
   }
 
   static extractContent(token: Token<any>, partType: SelectorPartType) {
-    if (partType === SelectorPartType.ID || partType === SelectorPartType.CLASS)
-      return token.value.slice(1);
+    if (partType === "ID" || partType === "CLASS") return token.value.slice(1);
     return token.value;
   }
 
@@ -40,27 +35,27 @@ export class SelectorPart {
   ) {
     switch (token.type) {
       case "KEYWORD":
-        if (isPsudeo) return SelectorPartType.PSEUDO_CLASS; // TODO: handle other cases?
+        if (isPsudeo) return "PSEUDO_CLASS"; // TODO: handle other cases?
         return SelectorPart.extractFromKeyword(token as Token<"KEYWORD">);
       case "AMPERSAND":
-        return SelectorPartType.PARENT;
+        return "PARENT";
       default:
-        return SelectorPartType.COMBINATOR;
+        return "COMBINATOR";
     }
   }
 
   static extractFromKeyword(token: Token<"KEYWORD">) {
     const result = /^(?<identifier>.)/.exec(token.value);
 
-    if (!result) return SelectorPartType.TAG;
+    if (!result) return "TAG";
 
     switch (result.groups!.identifier) {
       case ".":
-        return SelectorPartType.CLASS;
+        return "CLASS";
       case "#":
-        return SelectorPartType.ID;
+        return "ID";
       default:
-        return SelectorPartType.COMBINATOR;
+        return "COMBINATOR";
     }
   }
 }
