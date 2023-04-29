@@ -173,7 +173,13 @@ export class Lexer {
         this.loc()
       );
 
+      let watchSpace = this.current() === "&" || this.current() === "*";
+
       this.chopChar();
+
+      if (watchSpace && this.current() === " ") {
+        this._next = new Token("SPACE", " ", this.loc());
+      }
 
       return token;
     }

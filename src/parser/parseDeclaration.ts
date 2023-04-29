@@ -19,7 +19,7 @@ export function parseDeclaration(lexer: Lexer, priorToken?: Token<"KEYWORD">) {
     return;
   }
 
-  const valueToken = lexer.expect("KEYWORD");
+  let valueToken = lexer.expect("KEYWORD", "SPACE");
 
   if (valueToken instanceof ParserError) {
     report(valueToken.message, valueToken.loc);
