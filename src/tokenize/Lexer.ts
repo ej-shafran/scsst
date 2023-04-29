@@ -61,6 +61,19 @@ export class Lexer {
     return new Loc(this.filePath, this.row, this.cursor - this.lineStart + 1);
   }
 
+  isSelectorOrDeclaration() {
+    let i = 0;
+    while (
+      this.source[this.cursor + i] !== "{" &&
+      this.source[this.cursor + i] !== ";"
+    ) {
+      i++;
+      if (!this.source[this.cursor + i]) return "selector"; // TODO: ParserError here
+    }
+    if (this.source[this.cursor + i] === "{") return "selector";
+    else return "declaration";
+  }
+
   nextToken() {
     if (this._next) {
       const token = this._next;

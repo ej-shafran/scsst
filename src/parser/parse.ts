@@ -2,6 +2,7 @@ import { Token, report, Lexer, TokenType } from "../tokenize";
 
 import { ParserError } from "./ParserError";
 import { Comment, Selector, SelectorPart } from "./nodes";
+import { Block } from "./nodes/Block";
 import { Declaration } from "./nodes/Declaration";
 
 export function parseComment(
@@ -136,25 +137,42 @@ export function parseDeclaration(lexer: Lexer, priorToken?: Token<"KEYWORD">) {
   return new Declaration(keyToken.value, valueToken.value, keyToken.loc);
 }
 
-// function parseBlock(lexer: Lexer, priorToken?: Token<"OCURLY">) {
-//   let token: Token<TokenType> | ParserError =
-//     priorToken ?? lexer.expect("OCURLY");
-//
-//   if (token instanceof ParserError) {
-//     report(token.message, token.loc);
-//     return;
-//   }
-//
-//   let pendingToken: Token<TokenType> | null = null;
-//   const lines: Selector[] = []; // TODO: add declarations
-//
-//   while (token.type !== "CCURLY") {
-//     token = lexer.expect("CCURLY", "KEYWORD");
-//
-//     if (token instanceof ParserError) {
-//       report(token.message, token.loc);
-//       return;
-//     }
-//   }
-// }
-//
+export function parseBlock(lexer: Lexer, priorToken?: Token<"OCURLY">) {
+  let token: Token<TokenType> | ParserError =
+    priorToken ?? lexer.expect("OCURLY");
+
+  const originalLoc = token.loc;
+
+  if (token instanceof ParserError) {
+    report(token.message, token.loc);
+    return;
+  }
+
+  const lines: (Selector | Declaration)[] = [];
+
+  while (token.type !== "CCURLY") {
+    token = lexer.expect(
+      "CCURLY",
+      ...NESTED_SELECTOR_TOKENS.filter((type) => type !== "OCURLY") // TODO: take out of function
+    );
+
+    if (token instanceof ParserError) {
+      report(token.message, token.loc);
+      return;
+    }
+
+    if (token.type !== "CCURLY") {
+      const toParse = lexer.isSelectorOrDeclaration();
+
+      if (toParse == "selector") {
+        const selector = parseSelector(lexer, token as Token<any>, true); // TODO: change to rule
+        if (selector) lines.push(selector);
+      } else {
+        const declaration = parseDeclaration(lexer, token as Token<"KEYWORD">);
+        if (declaration) lines.push(declaration);
+      }
+    }
+  }
+
+  return new Block(lines, originalLoc);
+}
