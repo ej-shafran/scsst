@@ -10,7 +10,6 @@ type SelectorPartType =
   | "PSEUDO_CLASS";
 
 export class SelectorPart {
-  readonly type = "SELECTOR";
   partType: SelectorPartType;
   content: string;
   loc: Loc;
