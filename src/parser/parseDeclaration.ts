@@ -1,4 +1,5 @@
 import { Declaration } from "../nodes/Declaration";
+import { FunctionCall } from "../nodes/FunctionCall";
 import { Lexer, Token, TokenType, report } from "../tokenize";
 import { ParserError } from "./ParserError";
 import { parseFunctionCall } from "./parseFunctionCall";
@@ -25,7 +26,11 @@ export function parseDeclaration(lexer: Lexer, priorToken?: Token<"KEYWORD">) {
     return;
   }
 
-  const semicolonOrFunc = lexer.expect("SEMICOLON", "OPAREN"); // TODO: deal with spaces
+  let semicolonOrFunc: Token<TokenType> | ParserError = lexer.expect(
+    "SEMICOLON",
+    "OPAREN",
+    "KEYWORD"
+  );
 
   if (semicolonOrFunc instanceof ParserError) {
     report(semicolonOrFunc.message, semicolonOrFunc.loc);
@@ -33,24 +38,33 @@ export function parseDeclaration(lexer: Lexer, priorToken?: Token<"KEYWORD">) {
   }
 
   if (semicolonOrFunc.type === "SEMICOLON") {
-    return new Declaration(keyToken.value, valueToken.value, keyToken.loc);
+    return new Declaration(keyToken.value, [valueToken.value], keyToken.loc);
   }
 
-  const funcCall = parseFunctionCall(
-    lexer,
-    valueToken.value,
-    valueToken.loc,
-    semicolonOrFunc as Token<"OPAREN">
-  );
+  const values: (string | FunctionCall)[] = [];
 
-  if (!funcCall) return;
+  while (semicolonOrFunc.type !== "SEMICOLON") {
+    if (semicolonOrFunc.type === "KEYWORD") {
+      values.push(semicolonOrFunc.value);
+    } else {
+      const funcCall = parseFunctionCall(
+        lexer,
+        valueToken.value,
+        valueToken.loc,
+        semicolonOrFunc as Token<"OPAREN">
+      );
+      if (!funcCall) return;
 
-  error = lexer.expect("SEMICOLON");
+      values.push(funcCall);
+    }
 
-  if (error instanceof ParserError) {
-    report(error.message, error.loc);
-    return;
+    semicolonOrFunc = lexer.expect("SEMICOLON", "OPAREN", "KEYWORD");
+
+    if (semicolonOrFunc instanceof ParserError) {
+      report(semicolonOrFunc.message, semicolonOrFunc.loc);
+      return;
+    }
   }
 
-  return new Declaration(keyToken.value, funcCall, keyToken.loc);
+  return new Declaration(keyToken.value, values, keyToken.loc);
 }

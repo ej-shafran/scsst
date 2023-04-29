@@ -62,8 +62,8 @@ export function parseMediaQuery(lexer: Lexer, priorToken?: Token<"KEYWORD">) {
       return;
     }
 
-    if (cparenOrFuncCall.type === "CPAREN") {
-      query = new Declaration(keyToken.value, valueToken.value, keyToken.loc);
+    if (cparenOrFuncCall.type === "CPAREN") { //TODO: find a way to use parseDeclaration
+      query = new Declaration(keyToken.value, [valueToken.value], keyToken.loc);
     } else {
       const funcCall = parseFunctionCall(
         lexer,
@@ -73,7 +73,7 @@ export function parseMediaQuery(lexer: Lexer, priorToken?: Token<"KEYWORD">) {
       );
       if (!funcCall) return;
 
-      query = new Declaration(keyToken.value, funcCall, keyToken.loc);
+      query = new Declaration(keyToken.value, [funcCall], keyToken.loc);
 
       token = lexer.expect("CPAREN");
       if (token instanceof ParserError) return;
