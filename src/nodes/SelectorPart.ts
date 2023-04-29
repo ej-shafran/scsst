@@ -35,7 +35,7 @@ export class SelectorPart {
   ) {
     switch (token.type) {
       case "KEYWORD":
-        if (isPsudeo) return "PSEUDO_CLASS"; // TODO: handle other cases?
+        if (isPsudeo) return "PSEUDO_CLASS";
         return SelectorPart.extractFromKeyword(token as Token<"KEYWORD">);
       case "AMPERSAND":
         return "PARENT";
