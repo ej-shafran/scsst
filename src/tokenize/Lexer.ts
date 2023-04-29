@@ -123,6 +123,8 @@ export class Lexer {
         loc
       );
     }
+
+    throw new Error("Unrecognized token");
   }
 
   *[Symbol.iterator]() {
