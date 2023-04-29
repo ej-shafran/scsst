@@ -9,6 +9,8 @@ const source = fs.readFileSync(filePath, "utf-8");
 
 const lexer = new Lexer(source, filePath);
 
+//TODO: rename things to children
+
 function parse(lexer: Lexer): Node[] {
   let rule = parseRule(lexer);
   const rules = [rule];

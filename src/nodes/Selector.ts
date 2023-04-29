@@ -1,5 +1,6 @@
 import { Loc } from "../tokenize";
 import { Comment } from "./Comment";
+import { FunctionCall } from "./FunctionCall";
 import { SelectorPart } from "./SelectorPart";
 
 type Specificity = {
@@ -13,12 +14,17 @@ export class Selector {
   specificity: Specificity;
   content: string;
 
-  constructor(parts: (SelectorPart | Comment)[], public loc: Loc) {
+  constructor(
+    public parts: (SelectorPart | Comment | FunctionCall)[],
+    public loc: Loc
+  ) {
     this.specificity = Selector.calculateSpecificity(parts);
     this.content = Selector.buildContent(parts);
   }
 
-  static calculateSpecificity(parts: (SelectorPart | Comment)[]): Specificity {
+  static calculateSpecificity(
+    parts: (SelectorPart | Comment | FunctionCall)[]
+  ): Specificity {
     const results = {
       id: 0,
       class: 0,
@@ -26,10 +32,10 @@ export class Selector {
     };
 
     for (let part of parts) {
-      if ("type" in part) {
-        continue;
-      } else {
-        switch (part.partType) {
+      if (part.type === "SELECTOR_PART") {
+        switch (
+        part.partType // TODO: some renaming here
+        ) {
           case "ID":
             results.id++;
             break;
@@ -50,7 +56,7 @@ export class Selector {
     return results;
   }
 
-  static buildContent(parts: (SelectorPart | Comment)[]) {
+  static buildContent(parts: (SelectorPart | Comment | FunctionCall)[]) {
     let result = "";
 
     for (let part of parts) {
@@ -60,8 +66,9 @@ export class Selector {
     return result;
   }
 
-  static contentFor(part: SelectorPart | Comment) {
-    if ("type" in part) return part.text;
+  static contentFor(part: SelectorPart | Comment | FunctionCall) {
+    if (part.type === "COMMENT") return part.text;
+    if (part.type === "FUNCTION_CALL") return part.toString();
 
     switch (part.partType) {
       case "ID":

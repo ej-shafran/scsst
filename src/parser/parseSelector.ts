@@ -1,7 +1,9 @@
 import { Comment, Selector, SelectorPart } from "../nodes";
+import { FunctionCall } from "../nodes/FunctionCall";
 import { Lexer, Token, report } from "../tokenize";
 import { ParserError } from "./ParserError";
 import { parseComment } from "./parseComment";
+import { parseFunctionCall } from "./parseFunctionCall";
 
 export const COMMON_SELECTOR_TOKENS = [
   "KEYWORD",
@@ -43,7 +45,7 @@ export function parseSelector(
     return;
   }
 
-  const parts: (SelectorPart | Comment)[] = [];
+  const parts: (SelectorPart | Comment | FunctionCall)[] = [];
 
   let isPsudeo = false;
   let pendingSpace: SelectorPart | null = null;
@@ -63,7 +65,20 @@ export function parseSelector(
         isPsudeo = true;
         break;
       case "OPAREN":
-        break; // TODO: parse a function call
+        const lastPart = parts.pop();
+        if (!lastPart || lastPart.type !== "SELECTOR_PART") {
+          report("Unexpected OPAREN", token.loc);
+          return;
+        }
+        const funcCall = parseFunctionCall(
+          lexer,
+          Selector.contentFor(lastPart),
+          lastPart.loc,
+          token as Token<"OPAREN">
+        );
+        if (!funcCall) return;
+        parts.push(funcCall);
+        break;
       case "COMMA":
         break; // parse next selector
       case "SPACE":
