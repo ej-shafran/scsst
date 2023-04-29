@@ -1,9 +1,10 @@
 import { Token, report, Lexer, TokenType } from "../tokenize";
 
 import { ParserError } from "./ParserError";
-import { Comment, Selector, SelectorPart } from "./nodes";
-import { Block } from "./nodes/Block";
-import { Declaration } from "./nodes/Declaration";
+import { Comment, Selector, SelectorPart } from "../nodes";
+import { Block } from "../nodes/Block";
+import { Declaration } from "../nodes/Declaration";
+import { Rule } from "../nodes/Rule";
 
 export function parseComment(
   lexer: Lexer,
@@ -88,8 +89,6 @@ export function parseSelector(
       default:
         parts.push(new SelectorPart(token as Token<any>));
         break;
-      // case "OCURLY":
-      //   break; // start parsing block
     }
 
     token = lexer.expect(
@@ -175,4 +174,13 @@ export function parseBlock(lexer: Lexer, priorToken?: Token<"OCURLY">) {
   }
 
   return new Block(lines, originalLoc);
+}
+
+export function parseRule(lexer: Lexer, priorToken?: Token<any> /*TODO*/) {
+  const selector = parseSelector(lexer, priorToken);
+  const block = parseBlock(lexer);
+
+  if (!selector || !block) return;
+
+  return new Rule(selector, block, priorToken?.loc ?? selector.loc);
 }

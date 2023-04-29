@@ -1,4 +1,4 @@
-import { Loc } from "../../tokenize";
+import { Loc } from "../tokenize";
 import { Declaration } from "./Declaration";
 import { Selector } from "./Selector";
 

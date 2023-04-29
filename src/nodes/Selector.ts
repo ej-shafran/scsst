@@ -1,4 +1,4 @@
-import { Loc } from "../../tokenize";
+import { Loc } from "../tokenize";
 import { SelectorPart } from "./SelectorPart";
 
 type Specificity = {

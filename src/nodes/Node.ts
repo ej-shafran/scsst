@@ -1,4 +1,4 @@
-import { Loc } from "../../tokenize";
+import { Loc } from "../tokenize";
 
 export type Node = {
   readonly type: string;

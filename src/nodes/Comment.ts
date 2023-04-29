@@ -1,4 +1,4 @@
-import { Loc, Token } from "../../tokenize";
+import { Loc, Token } from "../tokenize";
 
 export class Comment {
   readonly type = "COMMENT";

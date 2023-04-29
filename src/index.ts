@@ -1,11 +1,8 @@
 import * as fs from "fs";
 
-import { Lexer, Token, TokenType, report } from "./tokenize";
-import { Node, ParserError } from "./parser";
-import { Selector, Stylesheet } from "./parser/nodes";
-import { parseSelector, parseDeclaration, parseBlock } from "./parser/parse";
-import { Declaration } from "./parser/nodes/Declaration";
-import { Block } from "./parser/nodes/Block";
+import { Lexer } from "./tokenize";
+import { Node, Stylesheet, Block } from "./nodes";
+import { parseBlock } from "./parser/parse";
 const filePath = "test.scss";
 const source = fs.readFileSync(filePath, "utf-8");
 
