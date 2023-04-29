@@ -66,7 +66,7 @@ export function parseSelector(
         break;
       case "OPAREN":
         const lastPart = parts.pop();
-        if (!lastPart || lastPart.type !== "SELECTOR_PART") {
+        if (!lastPart || lastPart.type !== "SELECTOR_SECTION") {
           report("Unexpected OPAREN", token.loc);
           return;
         }
