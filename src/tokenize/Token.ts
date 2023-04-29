@@ -17,7 +17,8 @@ export const TokenType = createEnum(
   "ASTERISK",
   "OPAREN",
   "CPAREN",
-  "COMMA"
+  "COMMA",
+  "SPACE",
 );
 export type TokenType = EnumType<typeof TokenType>;
 

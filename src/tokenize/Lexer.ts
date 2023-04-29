@@ -8,8 +8,11 @@ export class Lexer {
   cursor = 0;
   lineStart = 0;
   row = 1;
+  private _next: Token<"SPACE"> | null;
 
-  constructor(public source: string, public filePath: string) { }
+  constructor(public source: string, public filePath: string) {
+    this._next = null;
+  }
 
   current(amount = 1) {
     let result = "";
@@ -53,6 +56,12 @@ export class Lexer {
   }
 
   nextToken() {
+    if (this._next) {
+      const token = this._next;
+      this._next = null;
+      return token;
+    }
+
     this.trimLeft();
 
     if (this.isEmpty()) return;
@@ -117,6 +126,10 @@ export class Lexer {
 
       while (this.isNotEmpty() && !endsKeyword(this.current())) {
         this.chopChar();
+      }
+
+      if (this.current() === " ") {
+        this._next = new Token(TokenType.SPACE, " ", this.loc());
       }
 
       return new Token(
