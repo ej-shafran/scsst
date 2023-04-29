@@ -7,7 +7,7 @@ export class Block {
   readonly type = "BLOCK";
 
   constructor(
-    public lines: (Rule | Declaration | Comment)[],
+    public children: (Rule | Declaration | Comment)[],
     public loc: Loc
   ) { }
 }

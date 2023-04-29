@@ -15,11 +15,11 @@ export class Selector {
   content: string;
 
   constructor(
-    public parts: (SelectorPart | Comment | FunctionCall)[],
+    public children: (SelectorPart | Comment | FunctionCall)[],
     public loc: Loc
   ) {
-    this.specificity = Selector.calculateSpecificity(parts);
-    this.content = Selector.buildContent(parts);
+    this.specificity = Selector.calculateSpecificity(children);
+    this.content = Selector.buildContent(children);
   }
 
   static calculateSpecificity(
