@@ -1,6 +1,7 @@
-import { isWhitespace, selectorEnd, startsSelector } from "../common/functions";
+import { isWhitespace, endsKeyword, startsKeyword } from "../common/functions";
 import { Loc } from "./Loc";
-import { Token, TokenType } from "./Token";
+import { LiteralTokens, Token, TokenType } from "./Token";
+import { report } from "./report";
 
 export class Lexer {
   cursor = 0;
@@ -100,30 +101,43 @@ export class Lexer {
       this.chopChar();
 
       return new Token(
-        TokenType.SELECTOR,
+        TokenType.KEYWORD,
         this.source.slice(start, this.cursor),
         loc
       );
     }
 
     // selector
-    if (startsSelector(this.current())) {
+    if (startsKeyword(this.current())) {
       const loc = this.loc();
       const start = this.cursor;
 
       this.chopChar();
 
-      while (this.isNotEmpty() && !selectorEnd(this.current())) {
+      while (this.isNotEmpty() && !endsKeyword(this.current())) {
         this.chopChar();
       }
 
       return new Token(
-        TokenType.SELECTOR,
+        TokenType.KEYWORD,
         this.source.slice(start, this.cursor),
         loc
       );
     }
 
+    if (Object.keys(LiteralTokens).includes(this.current())) {
+      const token = new Token(
+        LiteralTokens[this.current() as keyof typeof LiteralTokens],
+        this.current(),
+        this.loc()
+      );
+
+      this.chopChar();
+
+      return token;
+    }
+
+    report("Unrecognized token", this.loc());
     throw new Error("Unrecognized token");
   }
 
