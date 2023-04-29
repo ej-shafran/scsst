@@ -20,7 +20,7 @@ export class SelectorPart {
   loc: Loc;
 
   constructor(
-    token: Token<"KEYWORD" | "AMPERSAND" | "ASTERISK" | "RARROW">,
+    token: Token<"KEYWORD" | "AMPERSAND" | "ASTERISK" | "RARROW" | "SPACE">,
     isPsudeo = false
   ) {
     this.loc = token.loc;
@@ -35,18 +35,17 @@ export class SelectorPart {
   }
 
   static extractPartType(
-    token: Token<"KEYWORD" | "AMPERSAND" | "ASTERISK" | "RARROW">,
+    token: Token<"KEYWORD" | "AMPERSAND" | "ASTERISK" | "RARROW" | "SPACE">,
     isPsudeo: boolean
   ) {
     switch (token.type) {
       case TokenType.KEYWORD:
         if (isPsudeo) return SelectorPartType.PSEUDO_CLASS; // TODO: handle other cases?
         return SelectorPart.extractFromKeyword(token as Token<"KEYWORD">);
-      case TokenType.ASTERISK:
-      case TokenType.RARROW:
-        return SelectorPartType.COMBINATOR;
       case TokenType.AMPERSAND:
         return SelectorPartType.PARENT;
+      default:
+        return SelectorPartType.COMBINATOR;
     }
   }
 

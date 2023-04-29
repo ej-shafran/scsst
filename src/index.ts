@@ -36,6 +36,7 @@ const active = [
   TokenType.RARROW,
   TokenType.LARROW,
   TokenType.OCURLY,
+  TokenType.SPACE,
 ] as const;
 
 const nested = [...active, TokenType.AMPERSAND] as const;
@@ -54,12 +55,6 @@ function parseSelector(lexer: Lexer, priorToken?: any, isNested?: boolean) {
 
   while (token.type !== "OCURLY") {
     switch (token.type) {
-      case TokenType.ASTERISK:
-      case TokenType.AMPERSAND:
-      case TokenType.RARROW:
-      case TokenType.LARROW:
-        parts.push(new SelectorPart(token as Token<any>));
-        break;
       case TokenType.KEYWORD:
         parts.push(new SelectorPart(token as Token<any>, isPsudeo));
         isPsudeo = false;
@@ -71,6 +66,9 @@ function parseSelector(lexer: Lexer, priorToken?: any, isNested?: boolean) {
         break; // parse a function call
       case TokenType.COMMA:
         break; // parse next selector
+      default:
+        parts.push(new SelectorPart(token as Token<any>));
+        break;
       // case TokenType.OCURLY:
       //   break; // start parsing block
     }
