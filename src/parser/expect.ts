@@ -10,7 +10,7 @@ function joinTypes(types: TokenType[]) {
 
   let result = "";
   for (let i = 0; i < types.length - 1; i++) {
-    result += types[i] + ", ";
+    result += types[i] + (i === types.length - 2 ? "" : ", ");
   }
 
   return result + " or " + types.at(-1)!;
@@ -30,7 +30,7 @@ export function expect<TTypes extends TokenType[]>(
     );
   }
 
-  if (!types.includes(token.type)) {
+  if (types.length && !types.includes(token.type)) {
     return new ParserError(
       `Expected ${joinTypes(types)} but got ${token.type}`,
       token.loc
