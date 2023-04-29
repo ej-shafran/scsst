@@ -9,9 +9,9 @@ type SelectorPartType =
   | "PARENT"
   | "PSEUDO_CLASS";
 
-export class SelectorPart {
-  readonly type = "SELECTOR_PART";
-  partType: SelectorPartType;
+export class SelectorSection {
+  readonly type = "SELECTOR_SECTION";
+  variant: SelectorPartType;
   content: string;
   loc: Loc;
 
@@ -20,8 +20,8 @@ export class SelectorPart {
     isPsudeo = false
   ) {
     this.loc = token.loc;
-    this.partType = SelectorPart.extractPartType(token, isPsudeo);
-    this.content = SelectorPart.extractContent(token, this.partType);
+    this.variant = SelectorSection.extractPartType(token, isPsudeo);
+    this.content = SelectorSection.extractContent(token, this.variant);
   }
 
   static extractContent(token: Token<any>, partType: SelectorPartType) {
@@ -36,7 +36,7 @@ export class SelectorPart {
     switch (token.type) {
       case "KEYWORD":
         if (isPsudeo) return "PSEUDO_CLASS";
-        return SelectorPart.extractFromKeyword(token as Token<"KEYWORD">);
+        return SelectorSection.extractFromKeyword(token as Token<"KEYWORD">);
       case "AMPERSAND":
         return "PARENT";
       default:
