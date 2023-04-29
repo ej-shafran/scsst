@@ -1,4 +1,4 @@
-import { Comment, Selector, SelectorPart } from "../nodes";
+import { Comment, Selector, SelectorSection } from "../nodes";
 import { FunctionCall } from "../nodes/FunctionCall";
 import { Lexer, Token, report } from "../tokenize";
 import { ParserError } from "./ParserError";
@@ -45,10 +45,10 @@ export function parseSelector(
     return;
   }
 
-  const parts: (SelectorPart | Comment | FunctionCall)[] = [];
+  const parts: (SelectorSection | Comment | FunctionCall)[] = [];
 
   let isPsudeo = false;
-  let pendingSpace: SelectorPart | null = null;
+  let pendingSpace: SelectorSection | null = null;
 
   while (token.type !== "OCURLY") {
     if (pendingSpace) {
@@ -58,7 +58,7 @@ export function parseSelector(
 
     switch (token.type) {
       case "KEYWORD":
-        parts.push(new SelectorPart(token as Token<any>, isPsudeo));
+        parts.push(new SelectorSection(token as Token<any>, isPsudeo));
         isPsudeo = false;
         break;
       case "COLON":
@@ -82,7 +82,7 @@ export function parseSelector(
       case "COMMA":
         break; // parse next selector
       case "SPACE":
-        pendingSpace = new SelectorPart(token as Token<any>);
+        pendingSpace = new SelectorSection(token as Token<any>);
         break;
       case "BLOCK_COMMENT":
         const comment = parseComment(lexer, token as Token<any>);
@@ -90,7 +90,7 @@ export function parseSelector(
         parts.push(comment);
         break;
       default:
-        parts.push(new SelectorPart(token as Token<any>));
+        parts.push(new SelectorSection(token as Token<any>));
         break;
     }
 
