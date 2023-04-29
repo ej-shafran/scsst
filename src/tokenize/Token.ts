@@ -1,6 +1,7 @@
-import { Loc } from "./Loc";
 import { createEnum } from "../common/functions";
 import { EnumType } from "../common/types";
+
+import { Loc } from "./Loc";
 
 export const TokenType = createEnum(
   "SINGLE_LINE_COMMENT",
@@ -34,6 +35,6 @@ export const LiteralTokens = {
   ",": TokenType.COMMA,
 };
 
-export class Token {
-  constructor(public type: TokenType, public value: string, public loc: Loc) { }
+export class Token<TType extends TokenType> {
+  constructor(public type: TType, public value: string, public loc: Loc) { }
 }

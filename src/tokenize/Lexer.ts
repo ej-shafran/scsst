@@ -1,4 +1,5 @@
 import { isWhitespace, endsKeyword, startsKeyword } from "../common/functions";
+
 import { Loc } from "./Loc";
 import { LiteralTokens, Token, TokenType } from "./Token";
 import { report } from "./report";
