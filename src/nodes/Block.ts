@@ -1,12 +1,13 @@
 import { Loc } from "../tokenize";
+import { Comment } from "./Comment";
 import { Declaration } from "./Declaration";
-import { Selector } from "./Selector";
+import { Rule } from "./Rule";
 
 export class Block {
   readonly type = "BLOCK";
 
   constructor(
-    public lines: (Selector | Declaration)[], // TODO: add declarations
+    public lines: (Rule | Declaration | Comment)[], // TODO: add declarations
     public loc: Loc
   ) { }
 }

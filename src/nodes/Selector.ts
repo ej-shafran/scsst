@@ -1,4 +1,5 @@
 import { Loc } from "../tokenize";
+import { Comment } from "./Comment";
 import { SelectorPart } from "./SelectorPart";
 
 type Specificity = {
@@ -12,12 +13,12 @@ export class Selector {
   specificity: Specificity;
   content: string;
 
-  constructor(parts: SelectorPart[], public loc: Loc) {
+  constructor(parts: (SelectorPart | Comment)[], public loc: Loc) {
     this.specificity = Selector.calculateSpecificity(parts);
     this.content = Selector.buildContent(parts);
   }
 
-  static calculateSpecificity(parts: SelectorPart[]): Specificity {
+  static calculateSpecificity(parts: (SelectorPart | Comment)[]): Specificity {
     const results = {
       id: 0,
       class: 0,
@@ -25,27 +26,31 @@ export class Selector {
     };
 
     for (let part of parts) {
-      switch (part.partType) {
-        case "ID":
-          results.id++;
-          break;
-        case "CLASS":
-        case "PSEUDO_CLASS":
-        case "ATTRIB":
-          results.class++;
-        case "TAG":
-          results.element++;
-        case "PARENT":
-          break; // TODO: maybe handle this some time?
-        case "COMBINATOR":
-          break;
+      if ("type" in part) {
+        continue;
+      } else {
+        switch (part.partType) {
+          case "ID":
+            results.id++;
+            break;
+          case "CLASS":
+          case "PSEUDO_CLASS":
+          case "ATTRIB":
+            results.class++;
+          case "TAG":
+            results.element++;
+          case "PARENT":
+            break; // TODO: maybe handle this some time?
+          case "COMBINATOR":
+            break;
+        }
       }
     }
 
     return results;
   }
 
-  static buildContent(parts: SelectorPart[]) {
+  static buildContent(parts: (SelectorPart | Comment)[]) {
     let result = "";
 
     for (let part of parts) {
@@ -55,7 +60,9 @@ export class Selector {
     return result;
   }
 
-  static contentFor(part: SelectorPart) {
+  static contentFor(part: SelectorPart | Comment) {
+    if ("type" in part) return part.text;
+
     switch (part.partType) {
       case "ID":
         return `#${part.content}`;

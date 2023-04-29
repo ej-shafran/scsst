@@ -132,15 +132,18 @@ export class Lexer {
       return new Token("KEYWORD", this.source.slice(start, this.cursor), loc);
     }
 
-    // selector
+    // keyword
     if (startsKeyword(this.current())) {
       const loc = this.loc();
       const start = this.cursor;
 
+      let hasNumber = /[0-9]/.test(this.current());
+
       this.chopChar();
 
-      while (this.isNotEmpty() && !endsKeyword(this.current())) {
+      while (this.isNotEmpty() && !endsKeyword(this.current(), hasNumber)) {
         this.chopChar();
+        hasNumber = /[0-9]/.test(this.current());
       }
 
       if (this.current() === " ") {

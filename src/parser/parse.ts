@@ -1,139 +1,40 @@
 import { Token, report, Lexer, TokenType } from "../tokenize";
 
 import { ParserError } from "./ParserError";
-import { Comment, Selector, SelectorPart } from "../nodes";
+import { Comment, SelectorList } from "../nodes";
 import { Block } from "../nodes/Block";
 import { Declaration } from "../nodes/Declaration";
 import { Rule } from "../nodes/Rule";
+import { NESTED_SELECTOR_TOKENS, parseSelector } from "./parseSelector";
+import { parseDeclaration } from "./parseDeclaration";
+import { parseComment } from "./parseComment";
 
-export function parseComment(
-  lexer: Lexer,
-  priorToken?: Token<"SINGLE_LINE_COMMENT" | "BLOCK_COMMENT">
-) {
-  const token =
-    priorToken ?? lexer.expect("SINGLE_LINE_COMMENT", "BLOCK_COMMENT");
-
-  if (token instanceof ParserError) {
-    report(token.message, token.loc);
-    return;
-  }
-
-  return new Comment(token);
-}
-
-const COMMON_SELECTOR_TOKENS = [
-  "KEYWORD",
-  "ASTERISK",
-  "COLON", // psuedo classes
-] as const;
-
-const MIDLINE_SELECTOR_TOKENS = [
-  ...COMMON_SELECTOR_TOKENS,
-  "OPAREN",
-  "COMMA",
-  "RARROW",
-  "LARROW",
-  "OCURLY",
-  "SPACE",
-] as const;
-
-const NESTED_SELECTOR_TOKENS = [
-  ...MIDLINE_SELECTOR_TOKENS,
-  "AMPERSAND",
-] as const;
-
-export function parseSelector(
+export function parseRule(
   lexer: Lexer,
   priorToken?: Token<(typeof NESTED_SELECTOR_TOKENS)[number]>,
   isNested?: boolean
 ) {
-  let token =
-    priorToken ??
-    lexer.expect(
-      ...(isNested ? NESTED_SELECTOR_TOKENS : COMMON_SELECTOR_TOKENS)
-    );
+  let result = parseSelector(lexer, priorToken, isNested);
+  if (!result) return;
 
-  const originalLoc = token.loc;
+  const originalLoc = result.selector.loc;
 
-  if (token instanceof ParserError) {
-    report(token.message, token.loc);
-    return;
-  }
-
-  const parts: SelectorPart[] = [];
-
-  let isPsudeo = false;
-  let pendingSpace: SelectorPart | null = null;
+  const selectors = [result.selector];
+  let token = result.token;
 
   while (token.type !== "OCURLY") {
-    if (pendingSpace) {
-      parts.push(pendingSpace);
-      pendingSpace = null;
-    }
+    result = parseSelector(lexer, undefined, isNested);
+    if (!result) return;
 
-    switch (token.type) {
-      case "KEYWORD":
-        parts.push(new SelectorPart(token as Token<any>, isPsudeo));
-        isPsudeo = false;
-        break;
-      case "COLON":
-        isPsudeo = true;
-        break;
-      case "OPAREN":
-        break; // parse a function call
-      case "COMMA":
-        break; // parse next selector
-      case "SPACE":
-        pendingSpace = new SelectorPart(token as Token<any>);
-        break;
-      default:
-        parts.push(new SelectorPart(token as Token<any>));
-        break;
-    }
-
-    token = lexer.expect(
-      ...(isNested ? NESTED_SELECTOR_TOKENS : MIDLINE_SELECTOR_TOKENS)
-    );
-
-    if (token instanceof ParserError) {
-      report(token.message, token.loc);
-      return;
-    }
+    selectors.push(result.selector);
+    token = result.token;
   }
 
-  return new Selector(parts, originalLoc);
-}
+  const selectorList = new SelectorList(selectors, originalLoc);
+  const block = parseBlock(lexer, token as Token<"OCURLY">);
+  if (!block) return;
 
-export function parseDeclaration(lexer: Lexer, priorToken?: Token<"KEYWORD">) {
-  const keyToken = priorToken ?? lexer.expect("KEYWORD");
-
-  if (keyToken instanceof ParserError) {
-    report(keyToken.message, keyToken.loc);
-    return;
-  }
-
-  let error: Token<TokenType> | ParserError = lexer.expect("COLON");
-
-  if (error instanceof ParserError) {
-    report(error.message, error.loc);
-    return;
-  }
-
-  const valueToken = lexer.expect("KEYWORD");
-
-  if (valueToken instanceof ParserError) {
-    report(valueToken.message, valueToken.loc);
-    return;
-  }
-
-  error = lexer.expect("SEMICOLON"); // TODO: deal with functions
-
-  if (error instanceof ParserError) {
-    report(error.message, error.loc);
-    return;
-  }
-
-  return new Declaration(keyToken.value, valueToken.value, keyToken.loc);
+  return new Rule(selectorList, block, originalLoc);
 }
 
 export function parseBlock(lexer: Lexer, priorToken?: Token<"OCURLY">) {
@@ -147,12 +48,13 @@ export function parseBlock(lexer: Lexer, priorToken?: Token<"OCURLY">) {
     return;
   }
 
-  const lines: (Selector | Declaration)[] = [];
+  const lines: (Rule | Declaration | Comment)[] = [];
 
   while (token.type !== "CCURLY") {
     token = lexer.expect(
       "CCURLY",
-      ...NESTED_SELECTOR_TOKENS.filter((type) => type !== "OCURLY") // TODO: take out of function
+      ...NESTED_SELECTOR_TOKENS.filter((type) => type !== "OCURLY"), // TODO: take out of function
+      "SINGLE_LINE_COMMENT"
     );
 
     if (token instanceof ParserError) {
@@ -160,11 +62,22 @@ export function parseBlock(lexer: Lexer, priorToken?: Token<"OCURLY">) {
       return;
     }
 
+    if (
+      token.type === "SINGLE_LINE_COMMENT" ||
+      token.type === "BLOCK_COMMENT"
+    ) {
+      const comment = parseComment(lexer, token as Token<any>);
+      if (!comment) return;
+
+      lines.push(comment);
+      continue;
+    }
+
     if (token.type !== "CCURLY") {
       const toParse = lexer.isSelectorOrDeclaration();
 
       if (toParse == "selector") {
-        const selector = parseSelector(lexer, token as Token<any>, true); // TODO: change to rule
+        const selector = parseRule(lexer, token as Token<any>, true);
         if (selector) lines.push(selector);
       } else {
         const declaration = parseDeclaration(lexer, token as Token<"KEYWORD">);
@@ -174,13 +87,4 @@ export function parseBlock(lexer: Lexer, priorToken?: Token<"OCURLY">) {
   }
 
   return new Block(lines, originalLoc);
-}
-
-export function parseRule(lexer: Lexer, priorToken?: Token<any> /*TODO*/) {
-  const selector = parseSelector(lexer, priorToken);
-  const block = parseBlock(lexer);
-
-  if (!selector || !block) return;
-
-  return new Rule(selector, block, priorToken?.loc ?? selector.loc);
 }

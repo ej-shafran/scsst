@@ -1,12 +1,12 @@
 import { Loc } from "../tokenize";
 import { Block } from "./Block";
-import { Selector } from "./Selector";
+import { SelectorList } from "./SelectorList";
 
 export class Rule {
   readonly type = "RULE";
 
   constructor(
-    public selector: Selector,
+    public selectorList: SelectorList,
     public block: Block,
     public loc: Loc
   ) { }
