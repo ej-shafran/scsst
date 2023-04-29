@@ -11,6 +11,7 @@
     "sass": "^1.62.1"
   },
   "scripts": {
-    "build": "tsc"
+    "build": "tsc",
+    "go": "ts-node src/index.ts"
   }
 }
