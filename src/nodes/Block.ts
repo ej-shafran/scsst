@@ -2,12 +2,13 @@ import { Loc } from "../tokenize";
 import { Comment } from "./Comment";
 import { Declaration } from "./Declaration";
 import { Rule } from "./Rule";
+import { Value } from "./Value";
 
 export class Block {
   readonly type = "BLOCK";
 
   constructor(
-    public children: (Rule | Declaration | Comment)[],
+    public children: (Rule | Declaration | Comment | Value)[],
     public loc: Loc
   ) { }
 

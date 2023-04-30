@@ -1,6 +1,6 @@
 import { Node, Rule } from "../nodes";
 
-type ChildrenOf<TNode extends Node> = TNode["children"] extends Node[]
+export type ChildOf<TNode extends Node> = TNode["children"] extends Node[]
   ? TNode["children"][number]
   : TNode extends Rule
   ? TNode["block"] | TNode["selectorList"]
@@ -8,7 +8,7 @@ type ChildrenOf<TNode extends Node> = TNode["children"] extends Node[]
 
 export function walk<TNode extends Node = Node>(
   node: TNode,
-  visitor: (node: ChildrenOf<TNode>) => void | "BREAK"
+  visitor: (node: ChildOf<TNode>) => void | "BREAK"
 ) {
   const result = visitor(node as any);
 

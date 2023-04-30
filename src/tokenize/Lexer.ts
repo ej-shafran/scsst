@@ -68,7 +68,7 @@ export class Lexer {
       this.source[this.cursor + i] !== ";"
     ) {
       i++;
-      if (!this.source[this.cursor + i]) return "selector"; // TODO: ParserError here
+      if (!this.source[this.cursor + i]) return "selector";
     }
     if (this.source[this.cursor + i] === "{") return "selector";
     else return "declaration";
