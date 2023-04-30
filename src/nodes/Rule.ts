@@ -17,6 +17,6 @@ export class Rule {
     const padding = repeat(" ", this.loc.col - 1);
     return `${padding}${this.selectorList.toString()} ${this.block.toString(
       padding
-    )}\n`;
+    )}`;
   }
 }

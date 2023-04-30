@@ -15,6 +15,6 @@ export class Declaration {
   toString() {
     return `${repeat(" ", this.loc.col - 1)}${this.key}: ${this.children
       .map((child) => child.toString())
-      .join(" ")}`;
+      .join(" ")};`;
   }
 }
