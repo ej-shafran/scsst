@@ -8,11 +8,7 @@
     "@types/node": "^18.16.3",
     "typescript": "^5.0.4"
   },
-  "dependencies": {
-    "sass": "^1.62.1"
-  },
   "scripts": {
-    "build": "tsc",
-    "go": "ts-node src/index.ts"
+    "build": "tsc"
   }
 }
