@@ -5,10 +5,9 @@ export class Comment {
   loc: Loc;
   block: boolean;
   text: string;
+  children = null;
 
-  constructor(
-    token: Token<"BLOCK_COMMENT"> | Token<"SINGLE_LINE_COMMENT">
-  ) {
+  constructor(token: Token<"BLOCK_COMMENT"> | Token<"SINGLE_LINE_COMMENT">) {
     this.block = token.type === "BLOCK_COMMENT";
     this.loc = token.loc;
     this.text = Comment.extractText(token);
@@ -19,5 +18,10 @@ export class Comment {
   ) {
     if (token.type === "SINGLE_LINE_COMMENT") return token.value.slice(2);
     else return token.value.replace(/\/\*(.*)\*\//s, "$1");
+  }
+
+  toString() {
+    if (this.block) return `/*${this.text}*/`;
+    return `//${this.text}`;
   }
 }

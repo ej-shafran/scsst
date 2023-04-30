@@ -1,5 +1,6 @@
 import { Declaration } from "../nodes/Declaration";
 import { MediaQuery } from "../nodes/MediaQuery";
+import { Value } from "../nodes/Value";
 import { Lexer, Token, TokenType, report } from "../tokenize";
 import { ParserError } from "./ParserError";
 import { parseBlock } from "./parseBlock";
@@ -62,8 +63,13 @@ export function parseMediaQuery(lexer: Lexer, priorToken?: Token<"KEYWORD">) {
       return;
     }
 
-    if (cparenOrFuncCall.type === "CPAREN") { //TODO: find a way to use parseDeclaration
-      query = new Declaration(keyToken.value, [valueToken.value], keyToken.loc);
+    if (cparenOrFuncCall.type === "CPAREN") {
+      //TODO: find a way to use parseDeclaration
+      query = new Declaration(
+        keyToken.value,
+        [new Value(valueToken.value, valueToken.loc)],
+        keyToken.loc
+      );
     } else {
       const funcCall = parseFunctionCall(
         lexer,

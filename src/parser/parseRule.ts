@@ -1,7 +1,6 @@
-import { Token, report, Lexer, TokenType } from "../tokenize";
+import { Token, Lexer } from "../tokenize";
 
-import { ParserError } from "./ParserError";
-import { Comment, SelectorList } from "../nodes";
+import { SelectorList } from "../nodes";
 import { Rule } from "../nodes/Rule";
 import { NESTED_SELECTOR_TOKENS, parseSelector } from "./parseSelector";
 import { parseBlock } from "./parseBlock";

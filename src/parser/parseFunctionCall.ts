@@ -1,3 +1,4 @@
+import { Value } from "../nodes/Value";
 import { FunctionCall } from "../nodes/FunctionCall";
 import { Lexer, Loc, Token, TokenType, report } from "../tokenize";
 import { ParserError } from "./ParserError";
@@ -16,7 +17,7 @@ export function parseFunctionCall(
     return;
   }
 
-  const argList: string[] = [];
+  const argList: Value[] = [];
   let needed: "KEYWORD" | "COMMA" = "KEYWORD";
 
   while (token.type !== "CPAREN") {
@@ -29,7 +30,7 @@ export function parseFunctionCall(
 
     if (token.type !== "CPAREN") {
       if (token.type === "KEYWORD") {
-        argList.push(token.value);
+        argList.push(new Value(token.value, token.loc));
       }
 
       needed = needed === "KEYWORD" ? "COMMA" : "KEYWORD";

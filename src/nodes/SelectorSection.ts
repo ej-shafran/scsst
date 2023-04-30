@@ -14,6 +14,7 @@ export class SelectorSection {
   variant: SelectorPartType;
   content: string;
   loc: Loc;
+  children = null;
 
   constructor(
     token: Token<"KEYWORD" | "AMPERSAND" | "ASTERISK" | "RARROW" | "SPACE">,
@@ -22,6 +23,10 @@ export class SelectorSection {
     this.loc = token.loc;
     this.variant = SelectorSection.extractPartType(token, isPsudeo);
     this.content = SelectorSection.extractContent(token, this.variant);
+  }
+
+  toString() {
+    return this.content;
   }
 
   static extractContent(token: Token<any>, partType: SelectorPartType) {

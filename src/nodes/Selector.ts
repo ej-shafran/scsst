@@ -22,6 +22,10 @@ export class Selector {
     this.content = Selector.buildContent(children);
   }
 
+  toString() {
+    return this.content;
+  }
+
   static calculateSpecificity(
     parts: (SelectorSection | Comment | FunctionCall)[]
   ): Specificity {

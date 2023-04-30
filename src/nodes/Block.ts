@@ -10,4 +10,9 @@ export class Block {
     public children: (Rule | Declaration | Comment)[],
     public loc: Loc
   ) { }
+
+  toString(endPad?: string) {
+    return `{\n${this.children.map((child) => child.toString()).join("\n")}\n${endPad ?? ""
+      }}`;
+  }
 }

@@ -4,6 +4,7 @@ import { Declaration } from "./Declaration";
 
 export class MediaQuery {
   readonly type = "MEDIA_QUERY";
+  children = null;
 
   constructor(
     public prefix: string,
@@ -11,4 +12,8 @@ export class MediaQuery {
     public block: Block,
     public loc: Loc
   ){}
+
+  toString() {
+    return `${this.prefix}${this.query?.toString() ?? ""} ${this.block.toString()}`
+  }
 }

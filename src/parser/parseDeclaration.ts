@@ -1,5 +1,6 @@
 import { Declaration } from "../nodes/Declaration";
 import { FunctionCall } from "../nodes/FunctionCall";
+import { Value } from "../nodes/Value";
 import { Lexer, Token, TokenType, report } from "../tokenize";
 import { ParserError } from "./ParserError";
 import { parseFunctionCall } from "./parseFunctionCall";
@@ -39,10 +40,14 @@ export function parseDeclaration(lexer: Lexer, priorToken?: Token<"KEYWORD">) {
   }
 
   if (semicolonOrFunc.type === "SEMICOLON") {
-    return new Declaration(keyToken.value, [valueToken.value], keyToken.loc);
+    return new Declaration(
+      keyToken.value,
+      [new Value(valueToken.value, valueToken.loc)],
+      keyToken.loc
+    );
   }
 
-  const values: (string | FunctionCall)[] = [];
+  const values: (Value | FunctionCall)[] = [];
 
   while (semicolonOrFunc.type !== "SEMICOLON") {
     if (semicolonOrFunc.type === "SPACE") {
@@ -55,7 +60,7 @@ export function parseDeclaration(lexer: Lexer, priorToken?: Token<"KEYWORD">) {
     }
 
     if (semicolonOrFunc.type === "KEYWORD") {
-      values.push(semicolonOrFunc.value);
+      values.push(new Value(semicolonOrFunc.value, semicolonOrFunc.loc));
     } else {
       const funcCall = parseFunctionCall(
         lexer,

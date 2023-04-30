@@ -1,3 +1,4 @@
+import { Value } from "./Value";
 import { Block } from "./Block";
 import { Comment } from "./Comment";
 import { Declaration } from "./Declaration";
@@ -7,6 +8,7 @@ import { Rule } from "./Rule";
 import { Selector } from "./Selector";
 import { SelectorList } from "./SelectorList";
 import { SelectorSection } from "./SelectorSection";
+import { Stylesheet } from "./Stylesheet";
 
 export type Node =
   | Block
@@ -18,4 +20,5 @@ export type Node =
   | Selector
   | SelectorList
   | SelectorSection
-  | StyleSheet;
+  | Stylesheet
+  | Value;

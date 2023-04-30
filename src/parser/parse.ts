@@ -7,11 +7,10 @@ export function parse(source: string, filePath?: string): Stylesheet {
   const lexer = new Lexer(source, filePath ?? "<unknown>");
   const originalLoc = lexer.loc();
 
-  const rules: Node[] = [];
+  const rules: Exclude<Node, Stylesheet>[] = [];
 
   while (lexer.isNotEmpty()) {
     const next = lexer.parseNext();
-    console.log(next);
 
     let rule: Node | undefined;
     switch (next) {
