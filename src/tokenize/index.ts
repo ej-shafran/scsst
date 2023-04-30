@@ -1,4 +1,4 @@
-export * from "./Token";
-export * from "./Lexer";
-export * from "./Loc";
-export * from "./report";
+export { Token, TokenType } from "./Token";
+export { Lexer } from "./Lexer";
+export { Loc } from "./Loc";
+export { report } from "./report";

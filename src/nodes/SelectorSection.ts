@@ -1,6 +1,6 @@
 import { Loc, Token } from "../tokenize";
 
-type SelectorPartType =
+export type SelectorSectionVariant =
   | "TAG"
   | "CLASS"
   | "ID"
@@ -11,7 +11,7 @@ type SelectorPartType =
 
 export class SelectorSection {
   readonly type = "SELECTOR_SECTION";
-  variant: SelectorPartType;
+  variant: SelectorSectionVariant;
   content: string;
   loc: Loc;
   children = null;
@@ -29,7 +29,7 @@ export class SelectorSection {
     return this.content;
   }
 
-  static extractContent(token: Token<any>, partType: SelectorPartType) {
+  static extractContent(token: Token<any>, partType: SelectorSectionVariant) {
     if (partType === "ID" || partType === "CLASS") return token.value.slice(1);
     return token.value;
   }
