@@ -1,20 +1,18 @@
-import { Block, Comment } from "../nodes";
-import { Declaration } from "../nodes/Declaration";
-import { Rule } from "../nodes/Rule";
+import { Block } from "../nodes";
 import { Lexer, Token, TokenType, report } from "../tokenize";
 import { ParserError } from "./ParserError";
 import { parseRule } from "./parseRule";
 import { parseComment } from "./parseComment";
 import { parseDeclaration } from "./parseDeclaration";
 import { NESTED_SELECTOR_TOKENS } from "./parseSelector";
+import { parseAtRule } from "./parseAtRule";
+import { ChildOf } from "../walker";
 
 const BLOCK_TOKENS = [
   "CCURLY",
   ...NESTED_SELECTOR_TOKENS.filter((type) => type !== "OCURLY"),
   "SINGLE_LINE_COMMENT",
 ] as const;
-
-//TODO: deal with @include, etc.
 
 export function parseBlock(lexer: Lexer, priorToken?: Token<"OCURLY">) {
   let token: Token<TokenType> | ParserError =
@@ -27,7 +25,7 @@ export function parseBlock(lexer: Lexer, priorToken?: Token<"OCURLY">) {
     return;
   }
 
-  const lines: (Rule | Declaration | Comment)[] = [];
+  const lines: ChildOf<Block>[] = [];
 
   while (token.type !== "CCURLY") {
     token = lexer.expect(...BLOCK_TOKENS);
@@ -55,8 +53,14 @@ export function parseBlock(lexer: Lexer, priorToken?: Token<"OCURLY">) {
         const selector = parseRule(lexer, token as Token<any>, true);
         if (selector) lines.push(selector);
       } else {
+        if (token.value.startsWith("@")) {
+          const atRule = parseAtRule(lexer, token as Token<"KEYWORD">);
+          if (atRule) lines.push(atRule);
+        } else {
         const declaration = parseDeclaration(lexer, token as Token<"KEYWORD">);
         if (declaration) lines.push(declaration);
+
+        }
       }
     }
   }

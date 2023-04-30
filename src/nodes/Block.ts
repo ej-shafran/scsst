@@ -1,4 +1,5 @@
 import { Loc } from "../tokenize";
+import { AtRule } from "./AtRule";
 import { Comment } from "./Comment";
 import { Declaration } from "./Declaration";
 import { Rule } from "./Rule";
@@ -8,7 +9,7 @@ export class Block {
   readonly type = "BLOCK";
 
   constructor(
-    public children: (Rule | Declaration | Comment | Value)[],
+    public children: (Rule | Declaration | Comment | Value | AtRule)[],
     public loc: Loc
   ) { }
 
