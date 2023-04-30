@@ -79,7 +79,7 @@ export class Lexer {
     while (isWhitespace(this.source[this.cursor + i])) i++;
     if (this.source[this.cursor + i] === "@") {
       if (this.isSelectorOrDeclaration() === "selector") return "MEDIA_QUERY";
-      else return "IMPORT_CALL";
+      else return "AT_RULE";
     }
 
     if (this.cursor + i >= this.source.length) return "END";

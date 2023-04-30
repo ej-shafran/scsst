@@ -15,7 +15,9 @@ export class MediaQuery {
   ) { }
 
   toString() {
-    return `${repeat(" ", this.loc.col - 1)}${this.prefix}${this.query?.toString() ?? ""
-      } ${this.block.toString()}`;
+    let queryString = this.query?.toString()?.replace(/;$/, "")?.trim();
+    queryString = queryString ? `(${queryString})` : "";
+    return `${repeat(" ", this.loc.col - 1)}${this.prefix
+      }${queryString} ${this.block.toString()}`;
   }
 }

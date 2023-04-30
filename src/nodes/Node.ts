@@ -9,8 +9,10 @@ import { Selector } from "./Selector";
 import { SelectorList } from "./SelectorList";
 import { SelectorSection } from "./SelectorSection";
 import { Stylesheet } from "./Stylesheet";
+import { AtRule } from "./AtRule";
 
 export type Node =
+  | AtRule
   | Block
   | Comment
   | Declaration

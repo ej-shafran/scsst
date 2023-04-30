@@ -1,5 +1,6 @@
 export { Node } from "./Node";
 
+export { AtRule } from "./AtRule";
 export { Block } from "./Block";
 export { Comment } from "./Comment";
 export { Declaration } from "./Declaration";

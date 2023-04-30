@@ -1,4 +1,5 @@
 import { Loc } from "../tokenize";
+import { AtRule } from "./AtRule";
 import { Block } from "./Block";
 import { Comment } from "./Comment";
 import { Declaration } from "./Declaration";
@@ -12,6 +13,7 @@ import { SelectorSection } from "./SelectorSection";
 import { Value } from "./Value";
 
 export type StylesheetChild =
+  | AtRule
   | Block
   | Comment
   | Declaration

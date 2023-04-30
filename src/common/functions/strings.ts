@@ -3,7 +3,7 @@ export function isWhitespace(char: string) {
 }
 
 export function startsKeyword(char: string) {
-  return /[.#$a-zA-Z0-9\-@]{1}/.test(char);
+  return /[.#$a-zA-Z0-9\-@"]{1}/.test(char);
 }
 
 export function endsKeyword(char: string, hasNumber?: boolean) {

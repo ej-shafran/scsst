@@ -1,5 +1,6 @@
 import { Node, Stylesheet } from "../nodes";
 import { Lexer } from "../tokenize";
+import { parseAtRule } from "./parseAtRule";
 import { parseMediaQuery } from "./parseMediaQuery";
 import { parseRule } from "./parseRule";
 
@@ -22,8 +23,10 @@ export function parse(source: string, filePath?: string): Stylesheet {
         rule = parseRule(lexer);
         if (rule) rules.push(rule);
         break;
-      case "IMPORT_CALL":
-        break; //TODO
+      case "AT_RULE":
+        rule = parseAtRule(lexer);
+        if (rule) rules.push(rule);
+        break;
       case "END":
         return new Stylesheet(originalLoc, rules);
     }
