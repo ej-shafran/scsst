@@ -1,3 +1,4 @@
+import { repeat } from "../common/functions";
 import { Loc, Token } from "../tokenize";
 
 export class Comment {
@@ -21,7 +22,7 @@ export class Comment {
   }
 
   toString() {
-    if (this.block) return `/*${this.text}*/`;
-    return `//${this.text}`;
+    if (this.block) return `${repeat(" ", this.loc.col - 1)}/*${this.text}*/`;
+    return `${repeat(" ", this.loc.col - 1)}//${this.text}`;
   }
 }
