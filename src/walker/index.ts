@@ -10,14 +10,14 @@ export type ChildOf<TNode extends Node> = TNode["children"] extends Node[]
 
 export function walk<TNode extends Node = Node>(
   node: TNode,
-  visitor: (node: ChildOf<TNode>) => void | "BREAK"
+  visitor: (node: TNode | ChildOf<TNode>) => void | "BREAK"
 ) {
-  const result = visitor(node as any);
+  const result = visitor(node);
 
   if (result === "BREAK") return;
 
   node.children?.forEach((child) => {
-    walk(child as any, visitor);
+    if (child) walk(child as any, visitor);
   });
 
   if (node.type === "RULE") {

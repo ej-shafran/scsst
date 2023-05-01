@@ -39,12 +39,15 @@ export function parseDeclaration(lexer: Lexer, priorToken?: Token<"KEYWORD">) {
     return;
   }
 
-  const values: (Value | FunctionCall)[] =
-    valueToken.type === "KEYWORD" && semicolonOrFunc.type !== "OPAREN"
-      ? [new Value(valueToken.value, valueToken.loc)]
-      : [];
+  let hasInitialValue =
+    valueToken.type === "KEYWORD" && semicolonOrFunc.type !== "OPAREN";
+
+  const values: (Value | FunctionCall)[] = hasInitialValue
+    ? [new Value(valueToken.value, valueToken.loc)]
+    : [];
 
   while (semicolonOrFunc.type !== "SEMICOLON") {
+    console.log(semicolonOrFunc);
     if (semicolonOrFunc.type === "SPACE") {
       semicolonOrFunc = lexer.expect("KEYWORD");
 
@@ -55,8 +58,12 @@ export function parseDeclaration(lexer: Lexer, priorToken?: Token<"KEYWORD">) {
     }
 
     if (semicolonOrFunc.type === "KEYWORD") {
-      values.push(new Value(semicolonOrFunc.value, semicolonOrFunc.loc));
-    } else {
+      if (hasInitialValue) {
+        hasInitialValue = false;
+      } else {
+        values.push(new Value(semicolonOrFunc.value, semicolonOrFunc.loc));
+      }
+    } else if (semicolonOrFunc.type === "OPAREN") {
       const funcCall = parseFunctionCall(
         lexer,
         valueToken.value,
