@@ -2,7 +2,6 @@ import { Value } from "../nodes/Value";
 import { FunctionCall } from "../nodes/FunctionCall";
 import { Lexer, Loc } from "../tokenize";
 import { TokenOf } from "../tokenize/Token";
-import { safe } from "./safe";
 
 const KEYWORD_TOKENS = ["KEYWORD", "CPAREN"] as const;
 const DELIMITER_TOKENS = ["SPACE", "COMMA", "CPAREN"] as const;
@@ -51,4 +50,3 @@ export function parseFunctionCall(
   return new FunctionCall(name, argList, functionLoc, !!spaceSeparated);
 }
 
-export default safe(parseFunctionCall);

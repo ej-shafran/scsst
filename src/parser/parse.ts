@@ -4,8 +4,8 @@ import { parseAtRule } from "./parseAtRule";
 import { parseMediaQuery } from "./parseMediaQuery";
 import { parseRule } from "./parseRule";
 
-export function parse(source: string, filePath?: string): Stylesheet {
-  const lexer = new Lexer(source, filePath ?? "<unknown>");
+export function parse(source: string, filePath = "<unknown>"): Stylesheet {
+  const lexer = new Lexer(source, filePath);
   const originalLoc = lexer.loc();
 
   const rules: Exclude<Node, Stylesheet>[] = [];

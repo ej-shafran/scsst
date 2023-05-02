@@ -2,7 +2,6 @@ import { Lexer, TokenOf } from "../tokenize";
 import { Rule } from "../nodes/Rule";
 import { SelectorToken, parseSelectorList } from "./parseSelectorList";
 import { parseBlock } from "./parseBlock";
-import { safe } from "./safe";
 
 export function parseRule(
   lexer: Lexer,
@@ -14,4 +13,3 @@ export function parseRule(
   return new Rule(selectorList, block, selectorList.loc);
 }
 
-export default safe(parseRule);

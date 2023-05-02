@@ -3,7 +3,6 @@ import { Value } from "../nodes/Value";
 import { Lexer, TokenOf, TokenType } from "../tokenize";
 import { ParserError } from "./ParserError";
 import { parseFunctionCall } from "./parseFunctionCall";
-import { safe } from "./safe";
 
 export function parseDeclaration(lexer: Lexer, priorToken?: TokenOf<"KEYWORD">, endingType: TokenType = "SEMICOLON") {
   const keyToken = priorToken ?? lexer.expect("KEYWORD");
@@ -37,4 +36,3 @@ export function parseDeclaration(lexer: Lexer, priorToken?: TokenOf<"KEYWORD">, 
   return new Declaration(keyToken.value, values, keyToken.loc);
 }
 
-export default safe(parseDeclaration);

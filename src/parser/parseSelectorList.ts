@@ -4,7 +4,6 @@ import { TokenOf } from "../tokenize/Token";
 import { ParserError } from "./ParserError";
 import { parseComment } from "./parseComment";
 import { parseFunctionCall } from "./parseFunctionCall";
-import { safe } from "./safe";
 
 const COMMON_SELECTOR_TOKENS = [
   "KEYWORD",
@@ -99,4 +98,3 @@ export function parseSelectorList(
   return new SelectorList(selectors, originalLoc, token);
 }
 
-export default safe(parseSelectorList);

@@ -1,6 +1,5 @@
 import { Comment } from "../nodes";
 import { Lexer, TokenOf } from "../tokenize";
-import { safe } from "./safe";
 
 export function parseComment(
   lexer: Lexer,
@@ -12,4 +11,3 @@ export function parseComment(
   return new Comment(token);
 }
 
-export default safe(parseComment);

@@ -5,7 +5,6 @@ import { parseComment } from "./parseComment";
 import { parseDeclaration } from "./parseDeclaration";
 import { parseAtRule } from "./parseAtRule";
 import { TokenOf } from "../tokenize/Token";
-import { safe } from "./safe";
 
 const BLOCK_TOKENS = [
   "CCURLY",
@@ -66,4 +65,3 @@ export function parseBlock(lexer: Lexer, priorToken?: TokenOf<"OCURLY">) {
   return new Block(lines, originalLoc);
 }
 
-export default safe(parseBlock);
