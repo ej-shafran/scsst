@@ -1,29 +1,22 @@
 import { Value } from "../nodes/Value";
 import { FunctionCall } from "../nodes/FunctionCall";
-import { Lexer, Loc, Token, TokenType, report } from "../tokenize";
-import { ParserError } from "./ParserError";
+import { Lexer, Loc } from "../tokenize";
+import { TokenOf } from "../tokenize/Token";
+import { safe } from "./safe";
 
 const KEYWORD_TOKENS = ["KEYWORD", "CPAREN"] as const;
-
 const DELIMITER_TOKENS = ["SPACE", "COMMA", "CPAREN"] as const;
-
 const SPACE_TOKENS = ["SPACE", "CPAREN"] as const;
-
 const COMMA_TOKENS = ["COMMA", "CPAREN"] as const;
 
 export function parseFunctionCall(
   lexer: Lexer,
   name: string,
   functionLoc: Loc,
-  priorToken?: Token<"OPAREN">
+  priorToken?: TokenOf<"OPAREN">
 ) {
-  let token: Token<TokenType> | ParserError =
+  let token: TokenOf<"OPAREN" | "CPAREN" | "KEYWORD" | "SPACE" | "COMMA"> =
     priorToken ?? lexer.expect("OPAREN");
-
-  if (token instanceof ParserError) {
-    report(token.message, token.loc);
-    return;
-  }
 
   const argList: Value[] = [];
   let isKeyword = true;
@@ -40,21 +33,22 @@ export function parseFunctionCall(
             : COMMA_TOKENS)
     );
 
-    if (token instanceof ParserError) {
-      report(token.message, token.loc);
-      return;
+    if (
+      spaceSeparated === null &&
+      (token.type === "SPACE" || token.type === "COMMA")
+    ) {
+      spaceSeparated = token.type === "SPACE";
     }
 
-    if (token.type !== "CPAREN") {
-      if (token.type === "KEYWORD") {
-        argList.push(new Value(token.value, token.loc));
-      }
-      else if (token.type === "SPACE") spaceSeparated = true;
-      else spaceSeparated = false;
+    if (token.type !== "CPAREN") isKeyword = !isKeyword;
 
-      isKeyword = !isKeyword;
+    if (token.type === "KEYWORD") {
+      const value = new Value(token.value, token.loc);
+      argList.push(value);
     }
   }
 
-  return new FunctionCall(name, argList, functionLoc, spaceSeparated ?? false);
+  return new FunctionCall(name, argList, functionLoc, !!spaceSeparated);
 }
+
+export default safe(parseFunctionCall);
