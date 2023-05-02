@@ -7,11 +7,11 @@ export class SelectorList {
   constructor(
     public children: Selector[],
     public loc: Loc,
-    private endToken: TokenOf<"OCURLY">
+    private _endToken: TokenOf<"OCURLY">
   ) { }
 
   getEndToken() {
-    return this.endToken;
+    return this._endToken;
   }
 
   toString() {
