@@ -4,7 +4,6 @@ import { Lexer, Token, TokenOf } from "../tokenize";
 import { parseBlock } from "./parseBlock";
 import { parseDeclaration } from "./parseDeclaration";
 import { MIDLINE_SELECTOR_TOKENS, SelectorToken } from "./parseSelectorList";
-import { safe } from "./safe";
 
 export function parseMediaQuery(lexer: Lexer, priorToken?: Token<"KEYWORD">) {
   let token: TokenOf<SelectorToken> = priorToken ?? lexer.expect("KEYWORD");
@@ -33,4 +32,3 @@ export function parseMediaQuery(lexer: Lexer, priorToken?: Token<"KEYWORD">) {
   return new MediaQuery(prefix, query, block, originalLoc);
 }
 
-export default safe(parseMediaQuery);
