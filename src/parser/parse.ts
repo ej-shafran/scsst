@@ -13,19 +13,15 @@ export function parse(source: string, filePath?: string): Stylesheet {
   while (lexer.isNotEmpty()) {
     const next = lexer.parseNext();
 
-    let rule: Node | undefined;
     switch (next) {
       case "MEDIA_QUERY":
-        rule = parseMediaQuery(lexer);
-        if (rule) rules.push(rule);
+        rules.push(parseMediaQuery(lexer));
         break;
       case "RULE":
-        rule = parseRule(lexer);
-        if (rule) rules.push(rule);
+        rules.push(parseRule(lexer));
         break;
       case "AT_RULE":
-        rule = parseAtRule(lexer);
-        if (rule) rules.push(rule);
+        rules.push(parseAtRule(lexer));
         break;
       case "END":
         return new Stylesheet(originalLoc, rules);

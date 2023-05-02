@@ -60,24 +60,24 @@ export class Lexer {
     return new Loc(this.filePath, this.row, this.cursor - this.lineStart + 1);
   }
 
-  isSelectorOrDeclaration() {
+  predictLineEnd() {
     let i = 0;
     while (
       this.source[this.cursor + i] !== "{" &&
       this.source[this.cursor + i] !== ";"
     ) {
       i++;
-      if (!this.source[this.cursor + i]) return "selector";
+      if (!this.source[this.cursor + i]) return "OCURLY";
     }
-    if (this.source[this.cursor + i] === "{") return "selector";
-    else return "declaration";
+    if (this.source[this.cursor + i] === "{") return "OCURLY";
+    else return "SEMICOLON";
   }
 
   parseNext() {
     let i = 0;
     while (isWhitespace(this.source[this.cursor + i])) i++;
     if (this.source[this.cursor + i] === "@") {
-      if (this.isSelectorOrDeclaration() === "selector") return "MEDIA_QUERY";
+      if (this.predictLineEnd() === "OCURLY") return "MEDIA_QUERY";
       else return "AT_RULE";
     }
 
@@ -186,7 +186,9 @@ export class Lexer {
     throw new ParserError("Unrecognized token", this.loc());
   }
 
-  expect<TTypes extends TokenType[]>(...types: TTypes): TokenOf<TTypes[number]> {
+  expect<TTypes extends TokenType[]>(
+    ...types: TTypes
+  ): TokenOf<TTypes[number]> {
     const originalLoc = this.loc();
     const token = this.nextToken();
 

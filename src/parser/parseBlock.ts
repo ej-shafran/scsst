@@ -1,5 +1,5 @@
 import { Block } from "../nodes";
-import { Lexer, Token } from "../tokenize";
+import { Lexer } from "../tokenize";
 import { parseRule } from "./parseRule";
 import { parseComment } from "./parseComment";
 import { parseDeclaration } from "./parseDeclaration";
@@ -37,17 +37,19 @@ export function parseBlock(lexer: Lexer, priorToken?: TokenOf<"OCURLY">) {
         lines.push(comment);
         break;
       case "KEYWORD":
-        const prediction = lexer.isSelectorOrDeclaration();
-        if (prediction === "selector") {
+        const prediction = lexer.predictLineEnd();
+
+        if (prediction === "OCURLY") {
           const rule = parseRule(lexer, token, true);
           lines.push(rule);
         } else if (token.value.startsWith("@")) {
-          const atRule = parseAtRule(lexer, token as Token<"KEYWORD">);
+          const atRule = parseAtRule(lexer, token);
           lines.push(atRule);
         } else {
           const declaration = parseDeclaration(lexer, token);
           lines.push(declaration);
         }
+
         break;
       case "RARROW":
       case "LARROW":
