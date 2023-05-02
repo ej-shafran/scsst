@@ -1,69 +1,66 @@
 import { Block } from "../nodes";
-import { Lexer, Token, TokenType, report } from "../tokenize";
-import { ParserError } from "./ParserError";
+import { Lexer, Token } from "../tokenize";
 import { parseRule } from "./parseRule";
 import { parseComment } from "./parseComment";
 import { parseDeclaration } from "./parseDeclaration";
-import { NESTED_SELECTOR_TOKENS } from "./parseSelector";
 import { parseAtRule } from "./parseAtRule";
-import { ChildOf } from "../walker";
+import { TokenOf } from "../tokenize/Token";
+import { safe } from "./safe";
 
 const BLOCK_TOKENS = [
   "CCURLY",
-  ...NESTED_SELECTOR_TOKENS.filter((type) => type !== "OCURLY"),
   "SINGLE_LINE_COMMENT",
+  "KEYWORD",
+  "BLOCK_COMMENT",
+  "SPACE",
+  "RARROW",
+  "LARROW",
+  "ASTERISK",
+  "AMPERSAND"
 ] as const;
+type BlockToken = typeof BLOCK_TOKENS[number];
 
-export function parseBlock(lexer: Lexer, priorToken?: Token<"OCURLY">) {
-  let token: Token<TokenType> | ParserError =
-    priorToken ?? lexer.expect("OCURLY");
+export function parseBlock(lexer: Lexer, priorToken?: TokenOf<"OCURLY">) {
+  let token: TokenOf<BlockToken | "OCURLY"> = priorToken ?? lexer.expect("OCURLY");
 
   const originalLoc = token.loc;
-
-  if (token instanceof ParserError) {
-    report(token.message, token.loc);
-    return;
-  }
-
-  const lines: ChildOf<Block>[] = [];
+  const lines: (Block["children"]) = [];
 
   while (token.type !== "CCURLY") {
     token = lexer.expect(...BLOCK_TOKENS);
 
-    if (token instanceof ParserError) {
-      report(token.message, token.loc);
-      return;
-    }
-
-    if (
-      token.type === "SINGLE_LINE_COMMENT" ||
-      token.type === "BLOCK_COMMENT"
-    ) {
-      const comment = parseComment(lexer, token as Token<any>);
-      if (!comment) return;
-
-      lines.push(comment);
-      continue;
-    }
-
-    if (token.type !== "CCURLY") {
-      const toParse = lexer.isSelectorOrDeclaration();
-
-      if (toParse == "selector") {
-        const selector = parseRule(lexer, token as Token<any>, true);
-        if (selector) lines.push(selector);
-      } else {
-        if (token.value.startsWith("@")) {
+    switch (token.type) {
+      case "SINGLE_LINE_COMMENT":
+      case "BLOCK_COMMENT":
+        const comment = parseComment(lexer, token);
+        lines.push(comment);
+        break;
+      case "KEYWORD":
+        const prediction = lexer.isSelectorOrDeclaration();
+        if (prediction === "selector") {
+          const rule = parseRule(lexer, token, true);
+          lines.push(rule!); //TODO: remove !
+        } else if (token.value.startsWith("@")) {
           const atRule = parseAtRule(lexer, token as Token<"KEYWORD">);
-          if (atRule) lines.push(atRule);
+          lines.push(atRule);
         } else {
-        const declaration = parseDeclaration(lexer, token as Token<"KEYWORD">);
-        if (declaration) lines.push(declaration);
-
+          const declaration = parseDeclaration(lexer, token);
+          lines.push(declaration);
         }
-      }
+        break;
+      case "RARROW":
+      case "LARROW":
+      case "ASTERISK":
+      case "AMPERSAND":
+          const rule = parseRule(lexer, token, true);
+          lines.push(rule!); //TODO: remove !
+          break;
+      default:
+        break;
     }
   }
 
   return new Block(lines, originalLoc);
 }
+
+export default safe(parseBlock);
