@@ -32,5 +32,14 @@ export const LiteralTokens = {
 } as const;
 
 export class Token<TType extends TokenType> {
-  constructor(public type: TType, public value: string, public loc: Loc) { }
+  constructor(public readonly type: TType, public value: string, public loc: Loc) { }
+
+  static isType<TTypes extends TokenType[]>(token: Token<TokenType>, ...types: TTypes): token is Token<TTypes[number]> {
+    return types.includes(token.type);
+  }
 }
+
+export type TokenOf<TType extends TokenType> = TType extends any
+  ? Token<TType>
+  : never;
+

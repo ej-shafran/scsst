@@ -7,8 +7,7 @@ import {
 import { ParserError } from "../parser";
 
 import { Loc } from "./Loc";
-import { LiteralTokens, Token, TokenType } from "./Token";
-import { report } from "./report";
+import { LiteralTokens, Token, TokenOf, TokenType } from "./Token";
 
 export class Lexer {
   cursor = 0;
@@ -87,7 +86,7 @@ export class Lexer {
     return "RULE";
   }
 
-  nextToken() {
+  nextToken(): TokenOf<TokenType> | undefined {
     if (this._next) {
       const token = this._next;
       this._next = null;
@@ -184,31 +183,28 @@ export class Lexer {
       return token;
     }
 
-    report("Unrecognized token", this.loc());
-    throw new Error("Unrecognized token");
+    throw new ParserError("Unrecognized token", this.loc());
   }
 
-  expect<TTypes extends TokenType[]>(
-    ...types: TTypes
-  ): ParserError | Token<TTypes[number]> {
+  expect<TTypes extends TokenType[]>(...types: TTypes): TokenOf<TTypes[number]> {
     const originalLoc = this.loc();
     const token = this.nextToken();
 
     if (!token) {
-      return new ParserError(
+      throw new ParserError(
         `Expected ${joinTypes(types)} but reached end of file`,
         originalLoc
       );
     }
 
     if (types.length && !types.includes(token.type)) {
-      return new ParserError(
+      throw new ParserError(
         `Expected ${joinTypes(types)} but got ${token.type}`,
         token.loc
       );
     }
 
-    return token;
+    return token as TokenOf<TTypes[number]>;
   }
 
   *[Symbol.iterator]() {
@@ -217,7 +213,5 @@ export class Lexer {
       yield token;
       token = this.nextToken();
     }
-
-    return;
   }
 }
