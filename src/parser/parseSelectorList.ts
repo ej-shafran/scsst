@@ -6,14 +6,14 @@ import { parseComment } from "./parseComment";
 import { parseFunctionCall } from "./parseFunctionCall";
 import { safe } from "./safe";
 
-export const COMMON_SELECTOR_TOKENS = [
+const COMMON_SELECTOR_TOKENS = [
   "KEYWORD",
   "ASTERISK",
-  "COLON", // psuedo classes
+  "COLON",
   "BLOCK_COMMENT",
 ] as const;
 
-export const MIDLINE_SELECTOR_TOKENS = [
+const MIDLINE_SELECTOR_TOKENS = [
   ...COMMON_SELECTOR_TOKENS,
   "OPAREN",
   "COMMA",
@@ -23,12 +23,12 @@ export const MIDLINE_SELECTOR_TOKENS = [
   "SPACE",
 ] as const;
 
-export const NESTED_SELECTOR_TOKENS = [
+const NESTED_SELECTOR_TOKENS = [
   ...MIDLINE_SELECTOR_TOKENS,
   "AMPERSAND",
 ] as const;
 
-type SelectorToken = (typeof NESTED_SELECTOR_TOKENS)[number];
+export type SelectorToken = (typeof NESTED_SELECTOR_TOKENS)[number];
 
 export function parseSelectorList(
   lexer: Lexer,
@@ -96,7 +96,7 @@ export function parseSelectorList(
     );
   }
 
-  return new SelectorList(selectors, originalLoc);
+  return new SelectorList(selectors, originalLoc, token);
 }
 
 export default safe(parseSelectorList);
