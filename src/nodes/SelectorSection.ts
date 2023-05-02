@@ -1,4 +1,4 @@
-import { Loc, Token, TokenType } from "../tokenize";
+import { Loc, Token, TokenOf } from "../tokenize";
 
 export type SelectorSectionVariant =
   | "TAG"
@@ -9,6 +9,14 @@ export type SelectorSectionVariant =
   | "PARENT"
   | "PSEUDO_CLASS";
 
+type SelectorSectionToken =
+  | "KEYWORD"
+  | "AMPERSAND"
+  | "ASTERISK"
+  | "RARROW"
+  | "SPACE"
+  | "LARROW";
+
 export class SelectorSection {
   readonly type = "SELECTOR_SECTION";
   variant: SelectorSectionVariant;
@@ -16,10 +24,7 @@ export class SelectorSection {
   loc: Loc;
   children = null;
 
-  constructor(
-    token: Token<"KEYWORD" | "AMPERSAND" | "ASTERISK" | "RARROW" | "SPACE">,
-    isPsudeo = false
-  ) {
+  constructor(token: TokenOf<SelectorSectionToken>, isPsudeo = false) {
     this.loc = token.loc;
     this.variant = SelectorSection.extractPartType(token, isPsudeo);
     this.content = SelectorSection.extractContent(token, this.variant);
@@ -29,19 +34,22 @@ export class SelectorSection {
     return this.content;
   }
 
-  static extractContent(token: Token<TokenType>, partType: SelectorSectionVariant) {
+  static extractContent(
+    token: TokenOf<SelectorSectionToken>,
+    partType: SelectorSectionVariant
+  ) {
     if (partType === "ID" || partType === "CLASS") return token.value.slice(1);
     return token.value;
   }
 
   static extractPartType(
-    token: Token<"KEYWORD" | "AMPERSAND" | "ASTERISK" | "RARROW" | "SPACE">,
+    token: TokenOf<SelectorSectionToken>,
     isPsudeo: boolean
   ) {
     switch (token.type) {
       case "KEYWORD":
         if (isPsudeo) return "PSEUDO_CLASS";
-        return SelectorSection.extractFromKeyword(token as Token<"KEYWORD">);
+        return SelectorSection.extractFromKeyword(token);
       case "AMPERSAND":
         return "PARENT";
       default:
@@ -50,7 +58,7 @@ export class SelectorSection {
   }
 
   static extractFromKeyword(token: Token<"KEYWORD">) {
-    const result = /^(?<identifier>.)/.exec(token.value);
+    const result = /^(?<identifier>\P{L})/.exec(token.value);
 
     if (!result) return "TAG";
 
