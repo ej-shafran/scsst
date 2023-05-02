@@ -16,15 +16,16 @@ const BLOCK_TOKENS = [
   "RARROW",
   "LARROW",
   "ASTERISK",
-  "AMPERSAND"
+  "AMPERSAND",
 ] as const;
-type BlockToken = typeof BLOCK_TOKENS[number];
+type BlockToken = (typeof BLOCK_TOKENS)[number];
 
 export function parseBlock(lexer: Lexer, priorToken?: TokenOf<"OCURLY">) {
-  let token: TokenOf<BlockToken | "OCURLY"> = priorToken ?? lexer.expect("OCURLY");
+  let token: TokenOf<BlockToken | "OCURLY"> =
+    priorToken ?? lexer.expect("OCURLY");
 
   const originalLoc = token.loc;
-  const lines: (Block["children"]) = [];
+  const lines: Block["children"] = [];
 
   while (token.type !== "CCURLY") {
     token = lexer.expect(...BLOCK_TOKENS);
@@ -39,7 +40,7 @@ export function parseBlock(lexer: Lexer, priorToken?: TokenOf<"OCURLY">) {
         const prediction = lexer.isSelectorOrDeclaration();
         if (prediction === "selector") {
           const rule = parseRule(lexer, token, true);
-          lines.push(rule!); //TODO: remove !
+          lines.push(rule);
         } else if (token.value.startsWith("@")) {
           const atRule = parseAtRule(lexer, token as Token<"KEYWORD">);
           lines.push(atRule);
@@ -52,9 +53,9 @@ export function parseBlock(lexer: Lexer, priorToken?: TokenOf<"OCURLY">) {
       case "LARROW":
       case "ASTERISK":
       case "AMPERSAND":
-          const rule = parseRule(lexer, token, true);
-          lines.push(rule!); //TODO: remove !
-          break;
+        const rule = parseRule(lexer, token, true);
+        lines.push(rule);
+        break;
       default:
         break;
     }
