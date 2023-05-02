@@ -1,21 +1,21 @@
 import { Declaration } from "../nodes/Declaration";
 import { Value } from "../nodes/Value";
-import { Lexer, TokenOf } from "../tokenize";
+import { Lexer, TokenOf, TokenType } from "../tokenize";
 import { ParserError } from "./ParserError";
 import { parseFunctionCall } from "./parseFunctionCall";
 import { safe } from "./safe";
 
-export function parseDeclaration(lexer: Lexer, priorToken?: TokenOf<"KEYWORD">) {
+export function parseDeclaration(lexer: Lexer, priorToken?: TokenOf<"KEYWORD">, endingType: TokenType = "SEMICOLON") {
   const keyToken = priorToken ?? lexer.expect("KEYWORD");
 
   lexer.expect("COLON");
 
   const values: (Declaration["children"]) = [];
 
-  let token: TokenOf<"KEYWORD" | "SPACE" | "SEMICOLON" | "OPAREN"> = lexer.expect("KEYWORD", "SPACE");
+  let token: TokenOf<TokenType> = lexer.expect("KEYWORD", "SPACE");
   let latest: TokenOf<"KEYWORD"> | null = null;
-  while (token.type !== "SEMICOLON") {
-    token = lexer.expect("KEYWORD", "OPAREN", "SPACE", "SEMICOLON");
+  while (token.type !== endingType) {
+    token = lexer.expect("KEYWORD", "OPAREN", "SPACE", endingType);
     switch (token.type) {
       case "KEYWORD":
         if (latest) values.push(new Value(latest.value, latest.loc));

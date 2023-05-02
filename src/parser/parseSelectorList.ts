@@ -13,7 +13,7 @@ const COMMON_SELECTOR_TOKENS = [
   "BLOCK_COMMENT",
 ] as const;
 
-const MIDLINE_SELECTOR_TOKENS = [
+export const MIDLINE_SELECTOR_TOKENS = [
   ...COMMON_SELECTOR_TOKENS,
   "OPAREN",
   "COMMA",
@@ -23,7 +23,7 @@ const MIDLINE_SELECTOR_TOKENS = [
   "SPACE",
 ] as const;
 
-const NESTED_SELECTOR_TOKENS = [
+export const NESTED_SELECTOR_TOKENS = [
   ...MIDLINE_SELECTOR_TOKENS,
   "AMPERSAND",
 ] as const;
