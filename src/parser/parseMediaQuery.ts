@@ -9,15 +9,10 @@ export function parseMediaQuery(lexer: Lexer, priorToken?: Token<"KEYWORD">) {
   let token: TokenOf<SelectorToken> = priorToken ?? lexer.expect("KEYWORD");
   const originalLoc = token.loc;
 
-  let prefix = token.value;
+  let prefix = "";
   let query: Declaration | null = null;
 
   while (token.type !== "OCURLY") {
-    switch (token.type) {
-      case "OPAREN":
-        break;
-    }
-
     if (token.type === "OPAREN") {
       query = parseDeclaration(lexer, undefined, "CPAREN");
     } else {

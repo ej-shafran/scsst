@@ -45,7 +45,7 @@ export function parseSelectorList(
   const originalLoc = token.loc;
 
   let currentLoc: Loc | null = token.loc;
-  let children: (Selector["children"]) = [];
+  let children: Selector["children"] = [];
   let isPsudeo = false;
   let pendingSpace: SelectorSection | null = null;
 
@@ -64,8 +64,17 @@ export function parseSelectorList(
         break;
       case "OPAREN":
         const lastPart = children.pop();
-        if (!lastPart) throw new ParserError("TODO", token.loc);
-        const funcCall = parseFunctionCall(lexer, Selector.contentFor(lastPart), lastPart.loc, token);
+        if (!lastPart)
+          throw new ParserError(
+            "Unexpected OPAREN while parsing selector list",
+            token.loc
+          );
+        const funcCall = parseFunctionCall(
+          lexer,
+          Selector.contentFor(lastPart),
+          lastPart.loc,
+          token
+        );
         children.push(funcCall);
         break;
       case "SPACE":
@@ -95,6 +104,7 @@ export function parseSelectorList(
     );
   }
 
+  selectors.push(new Selector(children, currentLoc ?? originalLoc));
+
   return new SelectorList(selectors, originalLoc, token);
 }
-

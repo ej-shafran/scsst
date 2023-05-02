@@ -5,7 +5,10 @@ import { parseAtRule } from "./parseAtRule";
 import { parseMediaQuery } from "./parseMediaQuery";
 import { parseRule } from "./parseRule";
 
-export function parse(source: string, filePath = "<unknown>"): Stylesheet {
+export function parse(
+  source: string,
+  filePath = "<unknown>"
+): Stylesheet | undefined {
   const lexer = new Lexer(source, filePath);
   const originalLoc = lexer.loc();
 
@@ -32,6 +35,7 @@ export function parse(source: string, filePath = "<unknown>"): Stylesheet {
   } catch (error) {
     if (error instanceof ParserError) {
       console.error(`${error.loc.toString()}: ${error.message}`);
+      return;
     } else throw error;
   }
 
